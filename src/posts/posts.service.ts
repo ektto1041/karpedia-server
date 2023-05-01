@@ -5,6 +5,7 @@ import { Posts } from './entities/posts.entity';
 import { Repository } from 'typeorm';
 import { TopicsService } from 'src/topics/topics.service';
 import { Topics } from 'src/topics/topics.entity';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostsService {
@@ -20,6 +21,17 @@ export class PostsService {
     // const topics = await this.topicsService.create(createPostDto.topics);
     const newPost: Posts = new Posts(createPostDto, savedTopics);
     const savedPost: Posts = await this.postsRepository.save(newPost);
+
+    return savedPost;
+  }
+
+  async update(updatePostDto: UpdatePostDto, id: number): Promise<Posts> {
+    const topicNames: string[] = updatePostDto.topics;
+    const savedTopics: Topics[] = await this.topicsService.create(topicNames);
+    // const topics = await this.topicsService.create(createPostDto.topics);
+    const newPost: Posts = new Posts(updatePostDto as CreatePostDto, savedTopics);
+    newPost.id = id;
+    const savedPost = await this.postsRepository.save(newPost);
 
     return savedPost;
   }
