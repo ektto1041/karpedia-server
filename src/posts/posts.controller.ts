@@ -32,6 +32,11 @@ export class PostsController {
     return this.postsService.findOne(id);
   }
 
+  @Get(':id/view')
+  findOneView(@Param('id') id: number) {
+    return this.postsService.findOneView(id);
+  }
+
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
   //   return this.postsService.update(+id, updatePostDto);

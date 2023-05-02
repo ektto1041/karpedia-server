@@ -18,7 +18,6 @@ export class PostsService {
   async create(createPostDto: CreatePostDto): Promise<Posts> {
     const topicNames: string[] = createPostDto.topics;
     const savedTopics: Topics[] = await this.topicsService.create(topicNames);
-    // const topics = await this.topicsService.create(createPostDto.topics);
     const newPost: Posts = new Posts(createPostDto, savedTopics);
     const savedPost: Posts = await this.postsRepository.save(newPost);
 
@@ -63,6 +62,11 @@ export class PostsService {
       relations: ['comments'],
       where: {id},
     });
+  };
+
+  async findOneView(id: number) {
+    await this.postsRepository.increment({id}, 'viewCount', 1);
+    return this.findOne(id);
   }
 
   // async remove(id: number) {
