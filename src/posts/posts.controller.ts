@@ -24,7 +24,7 @@ export class PostsController {
 
   @Get()
   async findAll() {
-    return 'a';
+    return this.postsService.findAll();
   }
 
   @Get(':id')

@@ -45,9 +45,15 @@ export class PostsService {
     return this.postsRepository.delete({id});
   }
 
-  // findAll(): Promise<Post[]> {
-  //   // return this.postsRepository.find();
-  // }
+  findAll(): Promise<Posts[]> {
+    return this.postsRepository.find({
+      where: {status: 0},
+      relations: ['topics'],
+      order: {
+        createdAt: 'DESC',
+      },
+    })
+  }
 
   findOne(id: number): Promise<Posts> {
     return this.postsRepository.findOne({
