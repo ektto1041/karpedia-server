@@ -18,7 +18,7 @@ export class PostsService {
   async create(createPostDto: CreatePostDto): Promise<Posts> {
     const topicNames: string[] = createPostDto.topics;
     const savedTopics: Topics[] = await this.topicsService.create(topicNames);
-    const newPost: Posts = new Posts(createPostDto, savedTopics);
+    const newPost: Posts = Posts.create(createPostDto, savedTopics);
     const savedPost: Posts = await this.postsRepository.save(newPost);
 
     return savedPost;

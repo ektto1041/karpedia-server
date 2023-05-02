@@ -6,17 +6,6 @@ import { UpdatePostDto } from "../dto/update-post.dto";
 
 @Entity()
 export class Posts {
-  constructor(createPostsDto: CreatePostDto, topics: Topics[]) {
-    if(createPostsDto) {
-      this.emoji = createPostsDto.emoji;
-      this.title = createPostsDto.title;
-      this.content = createPostsDto.content;
-      this.status = 0;
-      this.viewCount = 0;
-      this.topics = topics;
-    }
-  }
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -49,14 +38,25 @@ export class Posts {
   topics: Topics[];
 
   // methods
-  update(updatePostDto: UpdatePostDto, topics: Topics[]) {
+  static create(createPostsDto: CreatePostDto, topics: Topics[]): Posts {
+    const newPost = new Posts();
+    newPost.emoji = createPostsDto.emoji;
+    newPost.title = createPostsDto.title;
+    newPost.content = createPostsDto.content;
+    newPost.status = 0;
+    newPost.viewCount = 0;
+    newPost.topics = topics;
+    return newPost;
+  }
+
+  update(updatePostDto: UpdatePostDto, topics: Topics[]): void {
     this.emoji = updatePostDto.emoji;
     this.title = updatePostDto.title;
     this.content = updatePostDto.content;
     this.topics = topics;
   }
 
-  delete() {
+  delete(): void {
     this.status = 1;
   }
 }
