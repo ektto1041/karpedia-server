@@ -41,8 +41,11 @@ export class PostsService {
     return savedPost;
   }
   
-  delete(id: number): Promise<DeleteResult> {
-    return this.postsRepository.delete({id});
+  async delete(id: number): Promise<Posts> {
+    const foundPost: Posts = await this.postsRepository.findOne({where: {id}});
+    foundPost.delete();
+
+    return this.postsRepository.save(foundPost);
   }
 
   findAll(): Promise<Posts[]> {

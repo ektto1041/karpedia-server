@@ -55,4 +55,8 @@ export class Posts {
     this.content = updatePostDto.content;
     this.topics = topics;
   }
+
+  delete() {
+    this.status = 1;
+  }
 }
