@@ -4,17 +4,6 @@ import { CreateCommentsDto } from "./dto/create-comments.dto";
 
 @Entity()
 export class Comments {
-  constructor(createCommentsDto: CreateCommentsDto, post: Posts) {
-    if(createCommentsDto) {
-      this.name = createCommentsDto.name;
-      this.password = createCommentsDto.password;
-      this.content = createCommentsDto.content;
-      this.reply = '';
-      this.status = 0;
-      this.post = post;
-    }
-  }
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -41,4 +30,16 @@ export class Comments {
 
   @ManyToOne(() => Posts, post => post.comments)
   post: Posts;
+
+  // methods
+  static create(createCommentsDto: CreateCommentsDto, post: Posts): Comments {
+    const newComment = new Comments();
+    newComment.name = createCommentsDto.name;
+    newComment.password = createCommentsDto.password;
+    newComment.content = createCommentsDto.content;
+    newComment.reply = '';
+    newComment.status = 0;
+    newComment.post = post;
+    return newComment;
+  }
 }

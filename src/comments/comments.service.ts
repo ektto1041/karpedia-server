@@ -16,7 +16,7 @@ export class CommentsService {
 
   async create(createCommentsDto: CreateCommentsDto): Promise<Comments> {
     const foundPost: Posts = await this.postsService.findOne(createCommentsDto.postId);
-    const newComments: Comments = new Comments(createCommentsDto, foundPost);
+    const newComments: Comments = Comments.create(createCommentsDto, foundPost);
     
     return this.commentsRepository.save(newComments);
   }
