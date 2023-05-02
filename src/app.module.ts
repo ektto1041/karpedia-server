@@ -15,6 +15,7 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRoot({
   password: '1234',
   database: 'karpedia_test',
   entities: [Posts, Topics, Comments],
+  logging: true,
   // In Production, shoule be false
   synchronize: true,
 })

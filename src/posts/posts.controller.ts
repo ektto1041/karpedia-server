@@ -17,6 +17,11 @@ export class PostsController {
     return this.postsService.update(updatePostDto, id);
   }
 
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return this.postsService.delete(id);
+  }
+
   @Get()
   async findAll() {
     return 'a';

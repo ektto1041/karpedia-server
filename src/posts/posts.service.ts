@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Posts } from './entities/posts.entity';
-import { Repository, Transaction, UpdateResult } from 'typeorm';
+import { DeleteResult, Repository, Transaction, UpdateResult } from 'typeorm';
 import { TopicsService } from 'src/topics/topics.service';
 import { Topics } from 'src/topics/topics.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -33,12 +33,16 @@ export class PostsService {
 
     const topicNames: string[] = updatePostDto.topics;
     const savedTopics: Topics[] = await this.topicsService.create(topicNames);
-    
+
     foundPost.update(updatePostDto, savedTopics);
 
     const savedPost = await this.postsRepository.save(foundPost);
 
     return savedPost;
+  }
+  
+  delete(id: number): Promise<DeleteResult> {
+    return this.postsRepository.delete({id});
   }
 
   // findAll(): Promise<Post[]> {
