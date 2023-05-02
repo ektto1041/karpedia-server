@@ -2,6 +2,7 @@ import { Comments } from "src/comments/comments.entity";
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { CreatePostDto } from "../dto/create-post.dto";
 import { Topics } from "src/topics/topics.entity";
+import { UpdatePostDto } from "../dto/update-post.dto";
 
 @Entity()
 export class Posts {
@@ -46,4 +47,12 @@ export class Posts {
   @ManyToMany(() => Topics)
   @JoinTable()
   topics: Topics[];
+
+  // methods
+  update(updatePostDto: UpdatePostDto, topics: Topics[]) {
+    this.emoji = updatePostDto.emoji;
+    this.title = updatePostDto.title;
+    this.content = updatePostDto.content;
+    this.topics = topics;
+  }
 }

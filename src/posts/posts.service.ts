@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Posts } from './entities/posts.entity';
-import { Repository } from 'typeorm';
+import { Repository, Transaction, UpdateResult } from 'typeorm';
 import { TopicsService } from 'src/topics/topics.service';
 import { Topics } from 'src/topics/topics.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -26,12 +26,17 @@ export class PostsService {
   }
 
   async update(updatePostDto: UpdatePostDto, id: number): Promise<Posts> {
+    const foundPost = await this.postsRepository.findOne({
+      where: {id},
+      relations: ['topics']
+    });
+
     const topicNames: string[] = updatePostDto.topics;
     const savedTopics: Topics[] = await this.topicsService.create(topicNames);
-    // const topics = await this.topicsService.create(createPostDto.topics);
-    const newPost: Posts = new Posts(updatePostDto as CreatePostDto, savedTopics);
-    newPost.id = id;
-    const savedPost = await this.postsRepository.save(newPost);
+    
+    foundPost.update(updatePostDto, savedTopics);
+
+    const savedPost = await this.postsRepository.save(foundPost);
 
     return savedPost;
   }
