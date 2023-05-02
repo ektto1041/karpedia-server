@@ -40,4 +40,16 @@ export class CommentsService {
 
     return this.commentsRepository.save(foundComment);
   }
+
+  async delete(id: number): Promise<Comments> {
+    const foundComment = await this.commentsRepository.findOne({
+      where: {id},
+    });
+
+    if(!foundComment) throw new HttpException('NotFoundComment', HttpStatus.NOT_FOUND);
+
+    foundComment.delete();
+
+    return this.commentsRepository.save(foundComment);
+  }
 }

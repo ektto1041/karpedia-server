@@ -47,4 +47,8 @@ export class Comments {
   updateReply(reply: string): void {
     this.reply = reply;
   }
+
+  delete(): void {
+    this.status = 1;
+  }
 }
