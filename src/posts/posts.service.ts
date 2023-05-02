@@ -49,7 +49,7 @@ export class PostsService {
   //   // return this.postsRepository.find();
   // }
 
-  findOne(id: number): Promise<Posts | null> {
+  findOne(id: number): Promise<Posts> {
     return this.postsRepository.findOne({
       relations: ['comments'],
       where: {id},
