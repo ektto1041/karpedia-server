@@ -1,6 +1,7 @@
 import { Posts } from "src/posts/entities/posts.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { CreateCommentsDto } from "./dto/create-comments.dto";
+import { repl } from "@nestjs/core";
 
 @Entity()
 export class Comments {
@@ -41,5 +42,9 @@ export class Comments {
     newComment.status = 0;
     newComment.post = post;
     return newComment;
+  }
+
+  updateReply(reply: string): void {
+    this.reply = reply;
   }
 }

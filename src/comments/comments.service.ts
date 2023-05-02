@@ -1,10 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Comments } from "./comments.entity";
 import { CreateCommentsDto } from "./dto/create-comments.dto";
 import { PostsService } from "src/posts/posts.service";
 import { Posts } from "src/posts/entities/posts.entity";
+import { repl } from "@nestjs/core";
+import { UpdateRepliesDto } from "./dto/update-replies.dto";
 
 @Injectable()
 export class CommentsService {
@@ -25,5 +27,17 @@ export class CommentsService {
     return this.commentsRepository.find({
       relations: ["post"],
     });
+  }
+
+  async updateReply(updateRepliesDto: UpdateRepliesDto, id: number): Promise<Comments> {
+    const foundComment = await this.commentsRepository.findOne({
+      where: {id, status: 0},
+    });
+
+    if(!foundComment) throw new HttpException('NotFoundComment', HttpStatus.NOT_FOUND);
+
+    foundComment.updateReply(updateRepliesDto.reply);
+
+    return this.commentsRepository.save(foundComment);
   }
 }
