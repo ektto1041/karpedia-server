@@ -2,16 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Posts } from './entities/posts.entity';
-import { DeleteResult, Repository, Transaction, UpdateResult } from 'typeorm';
+import { And, ArrayContains, DataSource, DeleteResult, In, Like, QueryBuilder, Repository, SelectQueryBuilder, Transaction, UpdateResult } from 'typeorm';
 import { TopicsService } from 'src/topics/topics.service';
 import { Topics } from 'src/topics/topics.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostsPaging } from 'src/types';
+import { PostItemResDto } from './dto/post-item-res.dto';
+import { PostItemDto } from './dto/post-item.dto';
+
+const PAGE_SIZE = 10;
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Posts)
     private readonly postsRepository: Repository<Posts>,
+    private readonly a: DataSource,
     private readonly topicsService: TopicsService,
   ) {}
 
@@ -55,6 +61,45 @@ export class PostsService {
         createdAt: 'DESC',
       },
     })
+  }
+
+  async findAllPaging({page, keyword, topics}: PostsPaging): Promise<PostItemResDto> {
+    // 임시로 OR 조건 검사 하는 쿼리
+    const query = this.postsRepository.createQueryBuilder('post')
+      .leftJoin('post.topics', 'topic')
+      .orderBy({ ['post.createdAt']: 'DESC' })
+      .where('post.status = 0');
+    
+    if(keyword) query.andWhere('post.title LIKE :keyword', { keyword: `%${keyword}%` });
+    if(topics.length > 0) query.andWhere('topic.name In (:...topics)', { topics });
+
+    query.skip(page * PAGE_SIZE).take(PAGE_SIZE);
+
+    const foundPostIds = await query.getMany();
+    
+    const foundPosts = await this.postsRepository.find({
+      select: {
+        id: true,
+        emoji: true,
+        title: true,
+        viewCount: true,
+        modifiedAt: true,
+        createdAt: true,
+      },
+      where: {
+        id: In(foundPostIds.map(p => p.id)),
+      },
+      order: {
+        createdAt: 'DESC'
+      },
+      relations: ['topics']
+    })
+
+    // TODO: maxPage 계산
+    return {
+      data: foundPosts,
+      maxPage: Math.floor(foundPostIds.length / PAGE_SIZE),
+    };
   }
 
   findOne(id: number): Promise<Posts> {

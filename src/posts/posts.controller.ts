@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -23,8 +23,13 @@ export class PostsController {
   }
 
   @Get()
-  async findAll() {
+  findAll() {
     return this.postsService.findAll();
+  }
+
+  @Get('paging')
+  findAllPaging(@Query('page') page: number, @Query('keyword') keyword: string, @Query('topics') topics: string) {
+    return this.postsService.findAllPaging({page, keyword, topics: topics ? topics.split(',') : []});
   }
 
   @Get(':id')

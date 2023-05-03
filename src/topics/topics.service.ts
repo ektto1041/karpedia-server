@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Topics } from "./topics.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 @Injectable()
 export class TopicsService {
@@ -32,5 +32,13 @@ export class TopicsService {
 
   findAll(): Promise<Topics[]> {
     return this.topicsRepository.find();
+  }
+
+  findThem(topicNames: string[]): Promise<Topics[]> {
+    return this.topicsRepository.find({
+      where: {
+        name: In(topicNames),
+      },
+    });
   }
 }
