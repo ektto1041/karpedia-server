@@ -28,6 +28,13 @@ export class CommentsService {
       relations: ["post"],
     });
   }
+  
+  findAllByPostId(postId: number): Promise<Comments[]> {
+    return this.commentsRepository.find({
+      where: {post: {id: postId}},
+      relations: ['post']
+    });
+  }
 
   async updateReply(updateRepliesDto: UpdateRepliesDto, id: number): Promise<Comments> {
     const foundComment = await this.commentsRepository.findOne({

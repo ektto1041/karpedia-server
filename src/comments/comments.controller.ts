@@ -19,6 +19,11 @@ export class CommentsController {
     return this.commentsService.findAll();
   }
 
+  @Get('/posts/:postId')
+  findAllByPostId(@Param('postId') postId: number) {
+    return this.commentsService.findAllByPostId(postId);
+  }
+
   @Put('/reply/:id')
   updateReply(@Body() UpdateRepliesDto: UpdateRepliesDto, @Param('id') id: number) {
     return this.commentsService.updateReply(UpdateRepliesDto, id);
