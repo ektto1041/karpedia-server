@@ -69,14 +69,11 @@ export class PostsService {
       .leftJoin('post.topics', 'topic')
       .orderBy({ ['post.createdAt']: 'DESC' })
       .where('post.status = 0');
-    
     if(keyword) query.andWhere('post.title LIKE :keyword', { keyword: `%${keyword}%` });
     if(topics.length > 0) query.andWhere('topic.name In (:...topics)', { topics });
-
     query.skip(page * PAGE_SIZE).take(PAGE_SIZE);
 
-    const foundPostIds = await query.getMany();
-    
+    const [foundPostIds, totalCount] = await query.getManyAndCount();
     const foundPosts = await this.postsRepository.find({
       select: {
         id: true,
@@ -95,16 +92,18 @@ export class PostsService {
       relations: ['topics']
     })
 
-    // TODO: maxPage 계산
+    // 최대 페이지 수 계산
+    const maxPage = Math.floor(totalCount / PAGE_SIZE) - (totalCount % PAGE_SIZE === 0 ? 1 : 0);
+
     return {
       data: foundPosts,
-      maxPage: Math.floor(foundPostIds.length / PAGE_SIZE),
+      maxPage,
     };
   }
 
   findOne(id: number): Promise<Posts> {
     return this.postsRepository.findOne({
-      relations: ['comments'],
+      relations: ['comments', 'topics'],
       where: {id},
     });
   };
