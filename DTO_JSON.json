@@ -1,0 +1,16 @@
+{
+  "emoji": "A",
+  "title": "test-title",
+  "content": "test-content",
+  "topics": [
+    "topic1",
+    "topic2" 
+  ]
+}
+
+{
+  "name": "test-commenter",
+  "password": "1234",
+  "content": "test-content",
+  "postId": 1
+}
