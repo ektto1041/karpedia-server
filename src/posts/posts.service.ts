@@ -108,12 +108,7 @@ export class PostsService {
     });
   };
 
-  async findOneView(id: number) {
-    await this.postsRepository.increment({id}, 'viewCount', 1);
-    return this.findOne(id);
+  viewPost(id: number): Promise<UpdateResult> {
+    return this.postsRepository.increment({id}, "viewCount", 1);
   }
-
-  // async remove(id: number) {
-  //   await this.postsRepository.delete({id})
-  // }
 }
