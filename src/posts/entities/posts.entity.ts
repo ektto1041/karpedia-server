@@ -15,7 +15,7 @@ export class Posts {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ type: 'text' })
   content: string;
 
   @Column()
