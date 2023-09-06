@@ -8,6 +8,9 @@ import { CommentsModule } from './comments/comments.module';
 import { TopicsModule } from './topics/topics.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthsModule } from './auths/auths.module';
+import { Users } from './users/entities/users.entity';
+import { UsersModule } from './users/users.module';
 
 const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
@@ -19,7 +22,7 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
     username: configService.get('DB_USERNAME'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_DATABASE'),
-    entities: [Posts, Topics, Comments],
+    entities: [Users, Posts, Topics, Comments],
     logging: true,
     // In Production, shoule be false
     synchronize: configService.get('NODE_ENV') === 'prod' ? false : true,
@@ -33,9 +36,11 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
       envFilePath: '.env',
     }),
     typeOrmModule,
+    UsersModule,
     PostsModule,
     CommentsModule,
     TopicsModule,
+    AuthsModule,
   ],
   controllers: [],
   providers: [],
