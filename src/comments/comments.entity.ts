@@ -29,26 +29,26 @@ export class Comments {
   @UpdateDateColumn()
   modifiedAt: Date;
 
-  @ManyToOne(() => Posts, post => post.comments)
-  post: Posts;
+  // @ManyToOne(() => Posts, post => post.comments)
+  // post: Posts;
 
   // methods
-  static create(createCommentsDto: CreateCommentsDto, post: Posts): Comments {
-    const newComment = new Comments();
-    newComment.name = createCommentsDto.name;
-    newComment.password = createCommentsDto.password;
-    newComment.content = createCommentsDto.content;
-    newComment.reply = '';
-    newComment.status = 0;
-    newComment.post = post;
-    return newComment;
-  }
+  // static create(createCommentsDto: CreateCommentsDto, post: Posts): Comments {
+  //   const newComment = new Comments();
+  //   newComment.name = createCommentsDto.name;
+  //   newComment.password = createCommentsDto.password;
+  //   newComment.content = createCommentsDto.content;
+  //   newComment.reply = '';
+  //   newComment.status = 0;
+  //   newComment.post = post;
+  //   return newComment;
+  // }
 
-  updateReply(reply: string): void {
-    this.reply = reply;
-  }
+  // updateReply(reply: string): void {
+  //   this.reply = reply;
+  // }
 
-  delete(): void {
-    this.status = 1;
-  }
+  // delete(): void {
+  //   this.status = 1;
+  // }
 }

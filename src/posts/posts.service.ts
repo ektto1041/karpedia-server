@@ -18,97 +18,96 @@ export class PostsService {
     @InjectRepository(Posts)
     private readonly postsRepository: Repository<Posts>,
     private readonly a: DataSource,
-    private readonly topicsService: TopicsService,
   ) {}
 
-  async create(createPostDto: CreatePostDto): Promise<Posts> {
-    const topicNames: string[] = createPostDto.topics;
-    const savedTopics: Topics[] = await this.topicsService.create(topicNames);
-    const newPost: Posts = Posts.create(createPostDto, savedTopics);
-    const savedPost: Posts = await this.postsRepository.save(newPost);
+  // async create(createPostDto: CreatePostDto): Promise<Posts> {
+  //   const topicNames: string[] = createPostDto.topics;
+  //   const savedTopics: Topics[] = await this.topicsService.create(topicNames);
+  //   const newPost: Posts = Posts.create(createPostDto, savedTopics);
+  //   const savedPost: Posts = await this.postsRepository.save(newPost);
 
-    return savedPost;
-  }
+  //   return savedPost;
+  // }
 
-  async update(updatePostDto: UpdatePostDto, id: number): Promise<Posts> {
-    const foundPost = await this.postsRepository.findOne({
-      where: {id},
-      relations: ['topics']
-    });
+  // async update(updatePostDto: UpdatePostDto, id: number): Promise<Posts> {
+  //   const foundPost = await this.postsRepository.findOne({
+  //     where: {id},
+  //     relations: ['topics']
+  //   });
 
-    const topicNames: string[] = updatePostDto.topics;
-    const savedTopics: Topics[] = await this.topicsService.create(topicNames);
+  //   const topicNames: string[] = updatePostDto.topics;
+  //   const savedTopics: Topics[] = await this.topicsService.create(topicNames);
 
-    foundPost.update(updatePostDto, savedTopics);
+  //   foundPost.update(updatePostDto, savedTopics);
 
-    const savedPost = await this.postsRepository.save(foundPost);
+  //   const savedPost = await this.postsRepository.save(foundPost);
 
-    return savedPost;
-  }
+  //   return savedPost;
+  // }
   
-  async delete(id: number): Promise<Posts> {
-    const foundPost: Posts = await this.postsRepository.findOne({where: {id}});
-    foundPost.delete();
+  // async delete(id: number): Promise<Posts> {
+  //   const foundPost: Posts = await this.postsRepository.findOne({where: {id}});
+  //   foundPost.delete();
 
-    return this.postsRepository.save(foundPost);
-  }
+  //   return this.postsRepository.save(foundPost);
+  // }
 
-  findAll(): Promise<Posts[]> {
-    return this.postsRepository.find({
-      where: {status: 0},
-      relations: ['topics'],
-      order: {
-        createdAt: 'DESC',
-      },
-    })
-  }
+  // findAll(): Promise<Posts[]> {
+  //   return this.postsRepository.find({
+  //     where: {status: 0},
+  //     relations: ['topics'],
+  //     order: {
+  //       createdAt: 'DESC',
+  //     },
+  //   })
+  // }
 
-  async findAllPaging({page, keyword, topics}: PostsPaging): Promise<PostItemResDto> {
-    // 임시로 OR 조건 검사 하는 쿼리
-    const query = this.postsRepository.createQueryBuilder('post')
-      .leftJoin('post.topics', 'topic')
-      .orderBy({ ['post.createdAt']: 'DESC' })
-      .where('post.status = 0');
-    if(keyword) query.andWhere('post.title LIKE :keyword', { keyword: `%${keyword}%` });
-    if(topics.length > 0) query.andWhere('topic.name In (:...topics)', { topics });
-    query.skip(page * PAGE_SIZE).take(PAGE_SIZE);
+  // async findAllPaging({page, keyword, topics}: PostsPaging): Promise<PostItemResDto> {
+  //   // 임시로 OR 조건 검사 하는 쿼리
+  //   const query = this.postsRepository.createQueryBuilder('post')
+  //     .leftJoin('post.topics', 'topic')
+  //     .orderBy({ ['post.createdAt']: 'DESC' })
+  //     .where('post.status = 0');
+  //   if(keyword) query.andWhere('post.title LIKE :keyword', { keyword: `%${keyword}%` });
+  //   if(topics.length > 0) query.andWhere('topic.name In (:...topics)', { topics });
+  //   query.skip(page * PAGE_SIZE).take(PAGE_SIZE);
 
-    const [foundPostIds, totalCount] = await query.getManyAndCount();
-    const foundPosts = await this.postsRepository.find({
-      select: {
-        id: true,
-        emoji: true,
-        title: true,
-        viewCount: true,
-        modifiedAt: true,
-        createdAt: true,
-      },
-      where: {
-        id: In(foundPostIds.map(p => p.id)),
-      },
-      order: {
-        createdAt: 'DESC'
-      },
-      relations: ['topics']
-    })
+  //   const [foundPostIds, totalCount] = await query.getManyAndCount();
+  //   const foundPosts = await this.postsRepository.find({
+  //     select: {
+  //       id: true,
+  //       emoji: true,
+  //       title: true,
+  //       viewCount: true,
+  //       modifiedAt: true,
+  //       createdAt: true,
+  //     },
+  //     where: {
+  //       id: In(foundPostIds.map(p => p.id)),
+  //     },
+  //     order: {
+  //       createdAt: 'DESC'
+  //     },
+  //     relations: ['topics']
+  //   })
 
-    // 최대 페이지 수 계산
-    const maxPage = Math.floor(totalCount / PAGE_SIZE) - (totalCount % PAGE_SIZE === 0 ? 1 : 0);
+  //   // 최대 페이지 수 계산
+  //   const maxPage = Math.floor(totalCount / PAGE_SIZE) - (totalCount % PAGE_SIZE === 0 ? 1 : 0);
 
-    return {
-      data: foundPosts,
-      maxPage,
-    };
-  }
+  //   return {
+  //     data: foundPosts,
+  //     maxPage,
+  //   };
+  // }
 
-  findOne(id: number): Promise<Posts> {
-    return this.postsRepository.findOne({
-      relations: ['comments', 'topics'],
-      where: {id},
-    });
-  };
+  // findOne(id: number): Promise<Posts> {
+  //   return this.postsRepository.findOne({
+  //     relations: ['comments', 'topics'],
+  //     where: {id},
+  //   });
+  // };
 
-  viewPost(id: number): Promise<UpdateResult> {
-    return this.postsRepository.increment({id}, "viewCount", 1);
-  }
+  // viewPost(id: number): Promise<UpdateResult> {
+  //   return this.postsRepository.increment({id}, "viewCount", 1);
+  // }
 }

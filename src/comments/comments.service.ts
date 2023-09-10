@@ -16,47 +16,47 @@ export class CommentsService {
     private readonly postsService: PostsService,
   ) {}
 
-  async create(createCommentsDto: CreateCommentsDto): Promise<Comments> {
-    const foundPost: Posts = await this.postsService.findOne(createCommentsDto.postId);
-    const newComments: Comments = Comments.create(createCommentsDto, foundPost);
+  // async create(createCommentsDto: CreateCommentsDto): Promise<Comments> {
+  //   const foundPost: Posts = await this.postsService.findOne(createCommentsDto.postId);
+  //   const newComments: Comments = Comments.create(createCommentsDto, foundPost);
     
-    return this.commentsRepository.save(newComments);
-  }
+  //   return this.commentsRepository.save(newComments);
+  // }
 
-  findAll(): Promise<Comments[]> {
-    return this.commentsRepository.find({
-      relations: ["post"],
-    });
-  }
+  // findAll(): Promise<Comments[]> {
+  //   return this.commentsRepository.find({
+  //     relations: ["post"],
+  //   });
+  // }
   
-  findAllByPostId(postId: number): Promise<Comments[]> {
-    return this.commentsRepository.find({
-      where: {post: {id: postId}},
-      relations: ['post']
-    });
-  }
+  // findAllByPostId(postId: number): Promise<Comments[]> {
+  //   return this.commentsRepository.find({
+  //     where: {post: {id: postId}},
+  //     relations: ['post']
+  //   });
+  // }
 
-  async updateReply(updateRepliesDto: UpdateRepliesDto, id: number): Promise<Comments> {
-    const foundComment = await this.commentsRepository.findOne({
-      where: {id, status: 0},
-    });
+  // async updateReply(updateRepliesDto: UpdateRepliesDto, id: number): Promise<Comments> {
+  //   const foundComment = await this.commentsRepository.findOne({
+  //     where: {id, status: 0},
+  //   });
 
-    if(!foundComment) throw new HttpException('NotFoundComment', HttpStatus.NOT_FOUND);
+  //   if(!foundComment) throw new HttpException('NotFoundComment', HttpStatus.NOT_FOUND);
 
-    foundComment.updateReply(updateRepliesDto.reply);
+  //   foundComment.updateReply(updateRepliesDto.reply);
 
-    return this.commentsRepository.save(foundComment);
-  }
+  //   return this.commentsRepository.save(foundComment);
+  // }
 
-  async delete(id: number): Promise<Comments> {
-    const foundComment = await this.commentsRepository.findOne({
-      where: {id},
-    });
+  // async delete(id: number): Promise<Comments> {
+  //   const foundComment = await this.commentsRepository.findOne({
+  //     where: {id},
+  //   });
 
-    if(!foundComment) throw new HttpException('NotFoundComment', HttpStatus.NOT_FOUND);
+  //   if(!foundComment) throw new HttpException('NotFoundComment', HttpStatus.NOT_FOUND);
 
-    foundComment.delete();
+  //   foundComment.delete();
 
-    return this.commentsRepository.save(foundComment);
-  }
+  //   return this.commentsRepository.save(foundComment);
+  // }
 }

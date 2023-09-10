@@ -6,7 +6,7 @@ import { Posts } from './entities/posts.entity';
 import { TopicsModule } from 'src/topics/topics.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Posts]), TopicsModule],
+  imports: [TypeOrmModule.forFeature([Posts])],
   controllers: [PostsController],
   providers: [PostsService],
   exports: [
