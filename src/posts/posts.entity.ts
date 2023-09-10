@@ -1,8 +1,4 @@
-import { Comments } from "src/comments/comments.entity";
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { CreatePostDto } from "../dto/create-post.dto";
-import { Topics } from "src/topics/topics.entity";
-import { UpdatePostDto } from "../dto/update-post.dto";
 import { Chapters } from "src/chapters/chapters.entity";
 
 @Entity()
@@ -32,7 +28,7 @@ export class Posts {
   // @OneToMany(() => Comments, comment => comment.post)
   // comments: Comments[];
 
-  @ManyToOne(() => Chapters, chapters => chapters.id)
+  @ManyToOne(() => Chapters, chapters => chapters.id, { onDelete: 'CASCADE' })
   chapters: Chapters;
 
   /**

@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { Comments } from "./comments.entity";
 import { CreateCommentsDto } from "./dto/create-comments.dto";
 import { PostsService } from "src/posts/posts.service";
-import { Posts } from "src/posts/entities/posts.entity";
+import { Posts } from "src/posts/posts.entity";
 import { repl } from "@nestjs/core";
 import { UpdateRepliesDto } from "./dto/update-replies.dto";
 

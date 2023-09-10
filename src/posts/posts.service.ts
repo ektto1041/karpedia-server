@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Posts } from './entities/posts.entity';
+import { Posts } from './posts.entity';
 import { And, ArrayContains, DataSource, DeleteResult, In, Like, QueryBuilder, Repository, SelectQueryBuilder, Transaction, UpdateResult } from 'typeorm';
 import { TopicsService } from 'src/topics/topics.service';
 import { Topics } from 'src/topics/topics.entity';

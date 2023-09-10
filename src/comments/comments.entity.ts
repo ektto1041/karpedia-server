@@ -1,4 +1,4 @@
-import { Posts } from "src/posts/entities/posts.entity";
+import { Posts } from "src/posts/posts.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { CreateCommentsDto } from "./dto/create-comments.dto";
 import { repl } from "@nestjs/core";
