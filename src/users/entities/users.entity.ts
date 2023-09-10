@@ -19,6 +19,9 @@ export class Users {
   @Column()
   refreshToken: string;
 
+  @Column()
+  authority: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -32,6 +35,7 @@ export class Users {
     newUsers.name = createUserDto.name;
     newUsers.profileImage = createUserDto.profileImage;
     newUsers.refreshToken = createUserDto.refreshToken;
+    newUsers.authority = 0;
     return newUsers;
   }
 }

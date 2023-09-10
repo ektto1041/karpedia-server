@@ -1,14 +1,41 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Categories } from "src/categories/entities/Categories.entity";
+import { Chapters } from "src/chapters/chapters.entity";
+import { Users } from "src/users/entities/users.entity";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { TopicsDto } from "./dto/topics.dto";
+import { NewTopicsDto } from "./dto/new-topics.dto";
 
 @Entity()
 export class Topics {
-  constructor(name: string) {
-    this.name = name;
-  }
-
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   name: string;
+
+  @Column()
+  description: string;
+
+  @ManyToOne(() => Users, (users) => users.id)
+  users: Users;
+
+  @ManyToOne(() => Categories, (categories) => categories.id, { onDelete: 'CASCADE' })
+  categories: Categories;
+
+  @OneToMany(() => Chapters, chapters => chapters.topics)
+  chaptersList: Chapters[];
+
+  /**
+   * Methods
+   */
+  toTopicsDto() {
+    return new TopicsDto(this. id, this.name, this.description);
+  }
+
+  static fromNewTopicsDto(newTopicsDto: NewTopicsDto) {
+    const topics: Topics = new Topics();
+    topics.name = newTopicsDto.name;
+    topics.description = newTopicsDto.description;
+    return topics;
+  }
 }

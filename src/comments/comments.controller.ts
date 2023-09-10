@@ -9,28 +9,28 @@ export class CommentsController {
     private readonly commentsService: CommentsService,
   ) {}
 
-  @Post()
-  create(@Body() createCommentsDto: CreateCommentsDto) {
-    return this.commentsService.create(createCommentsDto);
-  }
+  // @Post()
+  // create(@Body() createCommentsDto: CreateCommentsDto) {
+  //   return this.commentsService.create(createCommentsDto);
+  // }
 
-  @Get()
-  findAll() {
-    return this.commentsService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.commentsService.findAll();
+  // }
 
-  @Get('/posts/:postId')
-  findAllByPostId(@Param('postId') postId: number) {
-    return this.commentsService.findAllByPostId(postId);
-  }
+  // @Get('/posts/:postId')
+  // findAllByPostId(@Param('postId') postId: number) {
+  //   return this.commentsService.findAllByPostId(postId);
+  // }
 
-  @Put('/reply/:id')
-  updateReply(@Body() UpdateRepliesDto: UpdateRepliesDto, @Param('id') id: number) {
-    return this.commentsService.updateReply(UpdateRepliesDto, id);
-  }
+  // @Put('/reply/:id')
+  // updateReply(@Body() UpdateRepliesDto: UpdateRepliesDto, @Param('id') id: number) {
+  //   return this.commentsService.updateReply(UpdateRepliesDto, id);
+  // }
 
-  @Delete(':id')
-  delete(@Param('id') id: number) {
-    return this.commentsService.delete(id);
-  }
+  // @Delete(':id')
+  // delete(@Param('id') id: number) {
+  //   return this.commentsService.delete(id);
+  // }
 }

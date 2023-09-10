@@ -1,4 +1,4 @@
-import { DynamicModule, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { DynamicModule, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { PostsModule } from './posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Posts } from './posts/entities/posts.entity';
@@ -11,6 +11,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthsModule } from './auths/auths.module';
 import { Users } from './users/entities/users.entity';
 import { UsersModule } from './users/users.module';
+import { CategoriesModule } from './categories/categories.module';
+import { Categories } from './categories/entities/Categories.entity';
+import { ChaptersModule } from './chapters/chapters.module';
+import { Chapters } from './chapters/chapters.entity';
+import { AdminMiddleware } from './middleware/admin.middleware';
 
 const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
@@ -22,7 +27,7 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
     username: configService.get('DB_USERNAME'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_DATABASE'),
-    entities: [Users, Posts, Topics, Comments],
+    entities: [Users, Posts, Topics, Comments, Categories, Chapters],
     logging: true,
     // In Production, shoule be false
     synchronize: configService.get('NODE_ENV') === 'prod' ? false : true,
@@ -41,6 +46,8 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
     CommentsModule,
     TopicsModule,
     AuthsModule,
+    CategoriesModule,
+    ChaptersModule,
   ],
   controllers: [],
   providers: [],
@@ -49,6 +56,18 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
       consumer
         .apply(AuthMiddleware)
-        .forRoutes('*');
+        .forRoutes(
+          '/topics/setting',
+          { path: 'categories', method: RequestMethod.POST },
+          { path: 'categories', method: RequestMethod.PUT },
+          { path: 'categories/:id', method: RequestMethod.DELETE },
+        )
+        .apply(AdminMiddleware)
+        .forRoutes(
+          '/topics/setting',
+          { path: 'categories', method: RequestMethod.POST },
+          { path: 'categories', method: RequestMethod.PUT },
+          { path: 'categories/:id', method: RequestMethod.DELETE },
+        );
   }
 }

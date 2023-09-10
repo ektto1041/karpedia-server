@@ -14,7 +14,7 @@ export class AuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     const accessToken = req.cookies.at;
     const refreshToken = req.cookies.rt;
-    console.log(req.cookies.at);
+
     if(accessToken) {
       // 1. Verify Access Token
       const verifiedResult = await this.authsService.verifyAccessToken(accessToken);
@@ -51,6 +51,9 @@ export class AuthMiddleware implements NestMiddleware {
           }
         }
       }
-    } else next();
+    } else {
+      res.status(400);
+      res.send();
+    }
   }
 }

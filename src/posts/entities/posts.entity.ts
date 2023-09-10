@@ -1,16 +1,14 @@
 import { Comments } from "src/comments/comments.entity";
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { CreatePostDto } from "../dto/create-post.dto";
 import { Topics } from "src/topics/topics.entity";
 import { UpdatePostDto } from "../dto/update-post.dto";
+import { Chapters } from "src/chapters/chapters.entity";
 
 @Entity()
 export class Posts {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ type: 'varchar', length: 4})
-  emoji: string;
 
   @Column()
   title: string;
@@ -20,6 +18,7 @@ export class Posts {
 
   @Column()
   status: number;
+  // 0 is open, 1 is hide
 
   @Column()
   viewCount: number;
@@ -30,32 +29,15 @@ export class Posts {
   @UpdateDateColumn()
   modifiedAt: Date;
 
-  @OneToMany(() => Comments, comment => comment.post)
-  comments: Comments[];
+  // @OneToMany(() => Comments, comment => comment.post)
+  // comments: Comments[];
 
-  @ManyToMany(() => Topics)
-  @JoinTable()
-  topics: Topics[];
+  @ManyToOne(() => Chapters, chapters => chapters.id)
+  chapters: Chapters;
 
-  // methods
-  static create(createPostsDto: CreatePostDto, topics: Topics[]): Posts {
-    const newPost = new Posts();
-    newPost.emoji = createPostsDto.emoji;
-    newPost.title = createPostsDto.title;
-    newPost.content = createPostsDto.content;
-    newPost.status = 0;
-    newPost.viewCount = 0;
-    newPost.topics = topics;
-    return newPost;
-  }
-
-  update(updatePostDto: UpdatePostDto, topics: Topics[]): void {
-    this.emoji = updatePostDto.emoji;
-    this.title = updatePostDto.title;
-    this.content = updatePostDto.content;
-    this.topics = topics;
-  }
-
+  /**
+   * Methods
+   */
   delete(): void {
     this.status = 1;
   }

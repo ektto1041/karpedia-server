@@ -22,11 +22,6 @@ export class AuthsController {
 
   @Get('google')
   googleLogin(@Res() res: Response) {
-    // const {authCode} = req;
-    // console.log(authCode);
-
-    Logger.log(this.configService.get("GOOGLE_REDIRECT_URI"))
-
     const scopes = [ 'https://www.googleapis.com/auth/userinfo.profile' ];
 
     const authrizationUrl: string = this.oauth2Client.generateAuthUrl({
@@ -52,8 +47,6 @@ export class AuthsController {
 
     const ob = this.authsService.getGoogleUserInfo(token.tokens.access_token);
     await ob.forEach(response => {
-      console.log(response.data);
-
       newUsers.serviceId = response.data.id;
       newUsers.name = response.data.email;
       newUsers.profileImage = response.data.picture;
@@ -65,6 +58,9 @@ export class AuthsController {
       foundUsers.refreshToken = newUsers.refreshToken;
       await this.usersService.update(foundUsers);
       res.cookie('uid', foundUsers.id);
+
+      // if admin
+      if(foundUsers.authority === 1) res.cookie('is_admin', '1');
     } else {
       const createdUsers = await this.usersService.create(newUsers);
       res.cookie('uid', createdUsers.id);
