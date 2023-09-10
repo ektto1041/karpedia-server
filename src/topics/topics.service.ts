@@ -69,14 +69,22 @@ export class TopicsService {
 
   findAllWithPosts(): Promise<TopicsWithChaptersDto[]> {
     return this.topicsRepository.find({
-      relations: ['chaptersList', 'chaptersList.postsList'],
+      relations: ['chaptersList', 'chaptersList.postsList', 'users'],
+      select: {users: {id: true, name: true, profileImage: true}} 
     });
   }
 
-  findOne(id: number): Promise<TopicsWithChaptersDto> {
+  async findOne(id: number): Promise<Topics> {
     return this.topicsRepository.findOne({
       where: { id },
-      relations: ['chaptersList', 'chaptersList.postsList'],
+    });
+  };
+
+  async findOneWithChapters(id: number): Promise<TopicsWithChaptersDto> {
+    return this.topicsRepository.findOne({
+      where: { id },
+      relations: ['chaptersList', 'chaptersList.postsList', 'users'],
+      select: {users: {id: true, name: true, profileImage: true}} 
     });
   };
 

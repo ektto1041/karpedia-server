@@ -26,7 +26,7 @@ export class TopicsController {
   }
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const result = await this.topicsService.findOne(id);
+    const result = await this.topicsService.findOneWithChapters(id);
 
     return result;
   }
