@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Topics } from "./topics.entity";
-import { DataSource, In, Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { TopicsWithCategoriesDto } from "./dto/topics-with-categories.dto";
 import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
 import { TopicsDto } from "./dto/topics.dto";
@@ -79,4 +79,15 @@ export class TopicsService {
       relations: ['chaptersList', 'chaptersList.postsList'],
     });
   };
+
+  async update(topics: TopicsDto): Promise<TopicsDto> {
+     const foundTopics = await this.topicsRepository.findOne({ where: { id: topics.id } });
+     foundTopics.update(topics);
+     const savedTopics = await this.topicsRepository.save(foundTopics);
+     return savedTopics.toTopicsDto();
+  }
+
+  delete(topicsId: number) {
+    this.topicsRepository.delete({ id: topicsId });
+  }
 }

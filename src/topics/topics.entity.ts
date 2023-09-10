@@ -38,4 +38,9 @@ export class Topics {
     topics.description = newTopicsDto.description;
     return topics;
   }
+
+  update(topicsDto: TopicsDto) {
+    this.name = topicsDto.name;
+    this.description = topicsDto.description;
+  }
 }

@@ -41,7 +41,7 @@ export class CategoriesService {
     return savedCategories.toCategoriesDto();
   }
 
-  async delete(id: number) {
-    await this.categoriesRepository.delete({ id });
+  delete(id: number) {
+    this.categoriesRepository.delete({ id });
   }
 }

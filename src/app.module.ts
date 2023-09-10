@@ -61,6 +61,9 @@ export class AppModule implements NestModule {
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },
           { path: 'categories/:id', method: RequestMethod.DELETE },
+          { path: 'topics', method: RequestMethod.POST },
+          { path: 'topics', method: RequestMethod.PUT },
+          { path: 'topics/:id', method: RequestMethod.DELETE },
         )
         .apply(AdminMiddleware)
         .forRoutes(
@@ -68,6 +71,9 @@ export class AppModule implements NestModule {
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },
           { path: 'categories/:id', method: RequestMethod.DELETE },
+          { path: 'topics', method: RequestMethod.POST },
+          { path: 'topics', method: RequestMethod.PUT },
+          { path: 'topics/:id', method: RequestMethod.DELETE },
         );
   }
 }
