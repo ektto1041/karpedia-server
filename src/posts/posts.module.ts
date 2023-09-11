@@ -4,9 +4,10 @@ import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Posts } from './posts.entity';
 import { TopicsModule } from 'src/topics/topics.module';
+import { ChaptersModule } from 'src/chapters/chapters.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Posts])],
+  imports: [TypeOrmModule.forFeature([Posts]), ChaptersModule],
   controllers: [PostsController],
   providers: [PostsService],
   exports: [

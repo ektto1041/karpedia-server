@@ -21,5 +21,9 @@ export class ChaptersService {
     const savedChapters = await this.chaptersRepository.save(chapters);
 
     return savedChapters.toChaptersDto();
-  }
+  };
+
+  async findOneById(chapterId: number): Promise<Chapters> {
+    return this.chaptersRepository.findOne({ where: { id: chapterId } });
+  };
 }
