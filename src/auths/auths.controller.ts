@@ -31,6 +31,7 @@ export class AuthsController {
       include_granted_scopes: true,
     });
 
+    res.header('Cache-Control', 'no-cache');
     res.redirect(301, authrizationUrl);
   }
 
@@ -68,6 +69,7 @@ export class AuthsController {
     
     res.cookie('at', token.tokens.access_token);
     res.cookie('rt', token.tokens.refresh_token);
+    res.header('Cache-Control', 'no-cache');
     res.redirect(301, this.configService.get('CLIENT_URI'));
   }
 
