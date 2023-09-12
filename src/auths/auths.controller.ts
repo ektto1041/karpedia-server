@@ -65,11 +65,11 @@ export class AuthsController {
       if(foundUsers.authority === 1) res.cookie('is_admin', '1', { domain: '.karpedia.site' });
     } else {
       const createdUsers = await this.usersService.create(newUsers);
-      res.cookie('uid', createdUsers.id);
+      res.cookie('uid', createdUsers.id, { domain: '.karpedia.site' });
     }
     
-    res.cookie('at', token.tokens.access_token);
-    res.cookie('rt', token.tokens.refresh_token);
+    res.cookie('at', token.tokens.access_token, { domain: '.karpedia.site' });
+    res.cookie('rt', token.tokens.refresh_token, { domain: '.karpedia.site' });
     res.header('Cache-Control', 'no-cache');
     res.redirect(301, this.configService.get('CLIENT_URI'));
   }
