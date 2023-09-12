@@ -39,6 +39,7 @@ export class AuthsController {
   async googleCallback(@Res() res: Response, @Query('code') code: string) {
     const token = await this.oauth2Client.getToken(code);
 
+    
     const newUsers: CreateUserDto = {
       serviceId: '',
       name: '',
@@ -58,10 +59,10 @@ export class AuthsController {
     if(foundUsers) {
       foundUsers.refreshToken = newUsers.refreshToken;
       await this.usersService.update(foundUsers);
-      res.cookie('uid', foundUsers.id);
+      res.cookie('uid', foundUsers.id, { domain: '.karpedia.site' });
 
       // if admin
-      if(foundUsers.authority === 1) res.cookie('is_admin', '1');
+      if(foundUsers.authority === 1) res.cookie('is_admin', '1', { domain: '.karpedia.site' });
     } else {
       const createdUsers = await this.usersService.create(newUsers);
       res.cookie('uid', createdUsers.id);
