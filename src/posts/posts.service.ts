@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Posts } from './entities/posts.entity';
+import { Posts } from './posts.entity';
 import { And, ArrayContains, DataSource, DeleteResult, In, Like, QueryBuilder, Repository, SelectQueryBuilder, Transaction, UpdateResult } from 'typeorm';
 import { TopicsService } from 'src/topics/topics.service';
 import { Topics } from 'src/topics/topics.entity';
@@ -9,6 +9,8 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsPaging } from 'src/types';
 import { PostItemResDto } from './dto/post-item-res.dto';
 import { PostItemDto } from './dto/post-item.dto';
+import { NewPostsDto } from './dto/new-posts.dto';
+import { ChaptersService } from 'src/chapters/chapters.service';
 
 const PAGE_SIZE = 10;
 
@@ -17,17 +19,17 @@ export class PostsService {
   constructor(
     @InjectRepository(Posts)
     private readonly postsRepository: Repository<Posts>,
-    private readonly a: DataSource,
+    private readonly chaptersService: ChaptersService,
   ) {}
 
-  // async create(createPostDto: CreatePostDto): Promise<Posts> {
-  //   const topicNames: string[] = createPostDto.topics;
-  //   const savedTopics: Topics[] = await this.topicsService.create(topicNames);
-  //   const newPost: Posts = Posts.create(createPostDto, savedTopics);
-  //   const savedPost: Posts = await this.postsRepository.save(newPost);
+  async create(newPosts: NewPostsDto): Promise<Posts> {
+    const posts = Posts.fromNewPostsDto(newPosts);
+    const foundChapters = await this.chaptersService.findOneById(newPosts.chapterId);
+    posts.chapters = foundChapters;
+    const savedPosts = await this.postsRepository.save(posts);
 
-  //   return savedPost;
-  // }
+    return savedPosts;
+  };
 
   // async update(updatePostDto: UpdatePostDto, id: number): Promise<Posts> {
   //   const foundPost = await this.postsRepository.findOne({

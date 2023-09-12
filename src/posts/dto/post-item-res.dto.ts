@@ -1,4 +1,4 @@
-import { Posts } from "../entities/posts.entity";
+import { Posts } from "../posts.entity";
 import { PostItemDto } from "./post-item.dto";
 
 export class PostItemResDto {

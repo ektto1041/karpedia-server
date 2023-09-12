@@ -1,16 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { NewPostsDto } from './dto/new-posts.dto';
+import { PostsDto } from './dto/posts.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  // @Post()
-  // create(@Body() createPostDto: CreatePostDto) {
-  //   return this.postsService.create(createPostDto);
-  // }
+  @Post()
+  async create(@Body() newPosts: NewPostsDto): Promise<PostsDto> {
+    const posts = await this.postsService.create(newPosts);
+
+    return posts.toPostsDto();
+  };
 
   // @Put(':id')
   // update(@Body() updatePostDto: UpdatePostDto, @Param('id') id: number) {

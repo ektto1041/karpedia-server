@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Topics } from "./topics.entity";
-import { DataSource, In, Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { TopicsWithCategoriesDto } from "./dto/topics-with-categories.dto";
 import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
 import { TopicsDto } from "./dto/topics.dto";
@@ -69,14 +69,33 @@ export class TopicsService {
 
   findAllWithPosts(): Promise<TopicsWithChaptersDto[]> {
     return this.topicsRepository.find({
-      relations: ['chaptersList', 'chaptersList.postsList'],
+      relations: ['chaptersList', 'chaptersList.postsList', 'users'],
+      select: {users: {id: true, name: true, profileImage: true}} 
     });
   }
 
-  findOne(id: number): Promise<TopicsWithChaptersDto> {
+  async findOne(id: number): Promise<Topics> {
     return this.topicsRepository.findOne({
       where: { id },
-      relations: ['chaptersList', 'chaptersList.postsList'],
     });
   };
+
+  async findOneWithChapters(id: number): Promise<TopicsWithChaptersDto> {
+    return this.topicsRepository.findOne({
+      where: { id },
+      relations: ['chaptersList', 'chaptersList.postsList', 'users'],
+      select: {users: {id: true, name: true, profileImage: true}} 
+    });
+  };
+
+  async update(topics: TopicsDto): Promise<TopicsDto> {
+     const foundTopics = await this.topicsRepository.findOne({ where: { id: topics.id } });
+     foundTopics.update(topics);
+     const savedTopics = await this.topicsRepository.save(foundTopics);
+     return savedTopics.toTopicsDto();
+  }
+
+  delete(topicsId: number) {
+    this.topicsRepository.delete({ id: topicsId });
+  }
 }

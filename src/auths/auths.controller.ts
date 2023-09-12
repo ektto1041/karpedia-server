@@ -68,7 +68,7 @@ export class AuthsController {
     
     res.cookie('at', token.tokens.access_token);
     res.cookie('rt', token.tokens.refresh_token);
-    res.redirect(301, 'http://localhost:3000');
+    res.redirect(301, this.configService.get('CLIENT_URI'));
   }
 
   // 임시
