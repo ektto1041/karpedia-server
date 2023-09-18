@@ -10,6 +10,9 @@ export class Categories {
   @Column()
   name: string;
 
+  @Column()
+  orders: number;
+
   // No Topics
   // 카테고리 이름만 가져오는 쿼리가 있기 때문
 

@@ -6,4 +6,5 @@ export class CategoriesDto {
 
   id: number;
   name: string;
+  orders: number;
 }
