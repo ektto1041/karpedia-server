@@ -16,8 +16,13 @@ export class ChaptersService {
 
   async create(newChapters: NewChaptersDto): Promise<ChaptersDto> {
     const chapters = Chapters.fromNewChaptersDto(newChapters);
+
     const foundTopics = await this.topicsService.findOne(newChapters.topicId);
     chapters.topics = foundTopics;
+
+    const maxOrder = await this.chaptersRepository.maximum('orders');
+    chapters.orders = maxOrder+1;
+
     const savedChapters = await this.chaptersRepository.save(chapters);
 
     return savedChapters.toChaptersDto();

@@ -15,6 +15,9 @@ export class Posts {
   content: string;
 
   @Column()
+  orders: number;
+
+  @Column()
   status: number;
   // 0 is open, 1 is hide
 
@@ -49,6 +52,7 @@ export class Posts {
     postsDto.viewCount = this.viewCount;
     postsDto.createdAt = this.createdAt;
     postsDto.modifiedAt = this.modifiedAt;
+    postsDto.orders = this.orders;
 
     return postsDto;
   };

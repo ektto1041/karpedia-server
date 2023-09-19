@@ -82,7 +82,7 @@ export class TopicsService {
     return this.topicsRepository.findOne({
       where: { id },
       relations: ['chaptersList', 'chaptersList.postsList', 'users'],
-      select: {users: {id: true, name: true, profileImage: true}} 
+      select: {users: {id: true, name: true, profileImage: true}},
     });
   };
 

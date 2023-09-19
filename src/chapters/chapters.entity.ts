@@ -15,6 +15,9 @@ export class Chapters {
   @Column()
   content: string;
 
+  @Column()
+  orders: number;
+
   @ManyToOne(() => Topics, (topics) => topics.id, { onDelete: 'CASCADE' })
   topics: Topics;
 
@@ -29,6 +32,7 @@ export class Chapters {
     chaptersDto.id = this.id;
     chaptersDto.title = this.title;
     chaptersDto.content = this.content;
+    chaptersDto.orders = this.orders;
 
     return chaptersDto;
   };
