@@ -12,7 +12,8 @@ export class TopicsController {
 
   @Get()
   async findAll(): Promise<TopicsDto[]> {
-    return this.topicsService.findAll();
+    const foundTopics = await this.topicsService.findAll();
+    return foundTopics.map(t => t.toTopicsDto());
   }
 
   @Get('posts')

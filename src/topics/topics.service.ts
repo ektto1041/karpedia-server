@@ -36,9 +36,10 @@ export class TopicsService {
     return savedTopics.toTopicsDto();
   }
 
-  async findAll(): Promise<TopicsDto[]> {
-    const foundTopics = await this.topicsRepository.find();
-    return foundTopics.map(t => t.toTopicsDto());
+  async findAll(): Promise<Topics[]> {
+    return await this.topicsRepository.find({
+      order: { orders: 'DESC' },
+    });
   }
 
   async findAllWithCategories(): Promise<TopicsWithCategoriesResDto> {
@@ -50,6 +51,7 @@ export class TopicsService {
       .createQueryBuilder('Topics')
       .leftJoinAndSelect('Topics.categories', 'Categories')
       .select(['Topics.name AS name', 'Topics.id AS id', 'Topics.description AS description', 'Topics.orders AS orders', 'Categories.id AS categoriesId'])
+      .orderBy('orders', 'DESC')
       .getRawMany<TopicsWithCategoriesDto>();
 
     // 3. create Res DTO
@@ -65,7 +67,8 @@ export class TopicsService {
   findAllWithPosts(): Promise<TopicsWithChaptersDto[]> {
     return this.topicsRepository.find({
       relations: ['chaptersList', 'chaptersList.postsList', 'users'],
-      select: {users: {id: true, name: true, profileImage: true}} 
+      select: {users: {id: true, name: true, profileImage: true}},
+      order: {orders: 'DESC'},
     });
   }
 
