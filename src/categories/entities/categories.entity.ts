@@ -20,7 +20,7 @@ export class Categories {
    * Methods
    */
   toCategoriesDto(): CategoriesDto {
-    return new CategoriesDto(this.id, this.name);
+    return new CategoriesDto(this.id, this.name, this.orders);
   }
 
   static fromNewCategoriesDto(newCategoriesDto: NewCategoriesDto) {

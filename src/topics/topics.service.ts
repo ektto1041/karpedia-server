@@ -26,6 +26,9 @@ export class TopicsService {
     const foundCategories = await this.categoriesService.findById(newTopics.categoriesId);
     const foundUsers = await this.usersService.findByUserId(userId);
 
+    const maxOrder = await this.topicsRepository.maximum('orders');
+    topics.orders = maxOrder+1;
+
     topics.categories = foundCategories;
     topics.users = foundUsers;
 
@@ -46,7 +49,7 @@ export class TopicsService {
     const allTopics: TopicsWithCategoriesDto[] = await this.topicsRepository
       .createQueryBuilder('Topics')
       .leftJoinAndSelect('Topics.categories', 'Categories')
-      .select(['Topics.name AS name', 'Topics.id AS id', 'Topics.description AS description', 'Categories.id AS categoriesId'])
+      .select(['Topics.name AS name', 'Topics.id AS id', 'Topics.description AS description', 'Topics.orders AS orders', 'Categories.id AS categoriesId'])
       .getRawMany<TopicsWithCategoriesDto>();
 
     // 3. create Res DTO
@@ -58,14 +61,6 @@ export class TopicsService {
 
     return result;
   }
-
-  findThem(topicNames: string[]): Promise<Topics[]> {
-    return this.topicsRepository.find({
-      where: {
-        name: In(topicNames),
-      },
-    });
-  };
 
   findAllWithPosts(): Promise<TopicsWithChaptersDto[]> {
     return this.topicsRepository.find({

@@ -5,6 +5,7 @@ export class TopicsWithChaptersDto {
   id: number;
   name: string;
   description: string;
+  orders: number;
   chaptersList: ChaptersWithPostsDto[];
   users: PublicUsersDto;
 };
