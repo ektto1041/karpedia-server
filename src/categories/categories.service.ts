@@ -22,6 +22,11 @@ export class CategoriesService {
 
   async create(newCategories: NewCategoriesDto): Promise<CategoriesDto> {
     const categories: Categories = Categories.fromNewCategoriesDto(newCategories);
+
+    // find max order
+    const maxOrder = await this.categoriesRepository.maximum('orders');
+    categories.orders = maxOrder+1;
+
     const savedCategories: Categories = await this.categoriesRepository.save(categories);
     return savedCategories.toCategoriesDto();
   }
