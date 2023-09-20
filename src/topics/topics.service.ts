@@ -30,8 +30,6 @@ export class TopicsService {
       .select('MAX(Topics.orders)', 'maxOrder')
       .where('Topics.categoriesId = :categoryId', { categoryId: foundCategories.id })
       .getRawOne();
-
-      console.log(maxOrder);
     
     topics.orders = maxOrder+1;
 

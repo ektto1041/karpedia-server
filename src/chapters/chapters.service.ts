@@ -20,7 +20,10 @@ export class ChaptersService {
     const foundTopics = await this.topicsService.findOne(newChapters.topicId);
     chapters.topics = foundTopics;
 
-    const maxOrder = await this.chaptersRepository.maximum('orders');
+    const {maxOrder} = await this.chaptersRepository.createQueryBuilder('Chapters')
+      .select('MAX(Chapters.orders)', 'maxOrder')
+      .where('Chapters.topicsId = :topicId', { topicId: foundTopics.id })
+      .getRawOne();
     chapters.orders = maxOrder+1;
 
     const savedChapters = await this.chaptersRepository.save(chapters);
