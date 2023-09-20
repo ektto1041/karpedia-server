@@ -20,6 +20,10 @@ export class AuthsController {
     this.configService.get("GOOGLE_REDIRECT_URI"),
   );
 
+  // Middleware 를 통해 로그인&어드민을 체크하는 API
+  @Get()
+  checkAuth() {}
+
   @Get('google')
   googleLogin(@Res() res: Response) {
     const scopes = [ 'https://www.googleapis.com/auth/userinfo.profile' ];
