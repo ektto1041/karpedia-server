@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Categories } from './entities/Categories.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesDto } from './dto/categories.dto';
@@ -46,6 +46,28 @@ export class CategoriesService {
     const savedCategories = await this.categoriesRepository.save(foundCategories);
 
     return savedCategories.toCategoriesDto();
+  }
+
+  async swapOrders(from: number, to: number): Promise<void> {
+    const result = await this.categoriesRepository.find({
+      where: {
+        id: In([from, to]),
+      },
+    });
+
+    console.log(result);
+
+    const [a, b] = result;
+
+    console.log(a);
+    console.log(b);
+
+    const tmp = a.orders;
+    a.orders = b.orders;
+    b.orders = tmp;
+
+    await this.categoriesRepository.save(a);
+    await this.categoriesRepository.save(b);
   }
 
   delete(id: number) {
