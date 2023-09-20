@@ -6,6 +6,7 @@ import { NewChaptersDto } from './dto/new-chapters.dto';
 import { TopicsService } from 'src/topics/topics.service';
 import { ChaptersDto } from './dto/chapters.dto';
 import { ChaptersWithTopicsIdDto } from './dto/chapters-with-topics-id.dto';
+import { NewChaptersUpdateDto } from './dto/new-chapters-update.dto';
 
 @Injectable()
 export class ChaptersService {
@@ -47,6 +48,25 @@ export class ChaptersService {
       'Topics.id AS topicsId'])
     .where('Chapters.id = :chapterId', { chapterId })
     .getRawOne<ChaptersWithTopicsIdDto>()
+  };
+
+  async update(newChapters: NewChaptersUpdateDto): Promise<Chapters> {
+    const {id} = newChapters;
+
+    const foundChapters = await this.chaptersRepository.findOne({
+      relations: {topics: true},
+      where: {id},
+    });
+
+    foundChapters.title = newChapters.title;
+    foundChapters.content = newChapters.content;
+
+    if(foundChapters.topics.id !== newChapters.topicId) {
+      const foundTopics = await this.topicsService.findOne(newChapters.topicId);
+      foundChapters.topics = foundTopics;
+    }
+    
+    return await this.chaptersRepository.save(foundChapters);
   };
 
   async swapOrders(from: number, to: number): Promise<void> {

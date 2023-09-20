@@ -65,6 +65,7 @@ export class AppModule implements NestModule {
           { path: 'topics', method: RequestMethod.POST },
           { path: 'topics', method: RequestMethod.PUT },
           { path: 'topics/:id', method: RequestMethod.DELETE },
+          { path: 'chapters', method: RequestMethod.PUT },
           '/chapters/update/:id',
         )
         .apply(AdminMiddleware)
@@ -77,6 +78,7 @@ export class AppModule implements NestModule {
           { path: 'topics', method: RequestMethod.POST },
           { path: 'topics', method: RequestMethod.PUT },
           { path: 'topics/:id', method: RequestMethod.DELETE },
+          { path: 'chapters', method: RequestMethod.PUT },
           '/chapters/update/:id',
         );
   }
