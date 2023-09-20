@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Topics } from "./topics.entity";
 import { Equal, In, Repository } from "typeorm";
 import { TopicsWithCategoriesDto } from "./dto/topics-with-categories.dto";
-import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
+import { TopicsWithChaptersWithPostsDto } from "./dto/topics-with-chapters-with-posts.dto";
 import { TopicsDto } from "./dto/topics.dto";
 import { Categories } from "src/categories/entities/Categories.entity";
 import { CategoriesService } from "src/categories/categories.service";
@@ -68,7 +68,7 @@ export class TopicsService {
     return result;
   }
 
-  findAllWithPosts(): Promise<TopicsWithChaptersDto[]> {
+  findAllWithPosts(): Promise<TopicsWithChaptersWithPostsDto[]> {
     return this.topicsRepository.find({
       relations: ['chaptersList', 'chaptersList.postsList', 'users'],
       select: {users: {id: true, name: true, profileImage: true}},
@@ -82,7 +82,7 @@ export class TopicsService {
     });
   };
 
-  async findOneWithChapters(id: number): Promise<TopicsWithChaptersDto> {
+  async findOneWithChapters(id: number): Promise<TopicsWithChaptersWithPostsDto> {
     return this.topicsRepository.findOne({
       where: { id },
       relations: ['chaptersList', 'chaptersList.postsList', 'users'],
