@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Topics } from "./topics.entity";
-import { In, Repository } from "typeorm";
+import { Equal, In, Repository } from "typeorm";
 import { TopicsWithCategoriesDto } from "./dto/topics-with-categories.dto";
 import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
 import { TopicsDto } from "./dto/topics.dto";
@@ -26,7 +26,13 @@ export class TopicsService {
     const foundCategories = await this.categoriesService.findById(newTopics.categoriesId);
     const foundUsers = await this.usersService.findByUserId(userId);
 
-    const maxOrder = await this.topicsRepository.maximum('orders');
+    const {maxOrder} = await this.topicsRepository.createQueryBuilder('Topics')
+      .select('MAX(Topics.orders)', 'maxOrder')
+      .where('Topics.categoriesId = :categoryId', { categoryId: foundCategories.id })
+      .getRawOne();
+
+      console.log(maxOrder);
+    
     topics.orders = maxOrder+1;
 
     topics.categories = foundCategories;
