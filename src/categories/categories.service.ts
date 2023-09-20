@@ -49,18 +49,11 @@ export class CategoriesService {
   }
 
   async swapOrders(from: number, to: number): Promise<void> {
-    const result = await this.categoriesRepository.find({
+    const [a, b] = await this.categoriesRepository.find({
       where: {
         id: In([from, to]),
       },
     });
-
-    console.log(result);
-
-    const [a, b] = result;
-
-    console.log(a);
-    console.log(b);
 
     const tmp = a.orders;
     a.orders = b.orders;

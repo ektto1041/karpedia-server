@@ -93,6 +93,21 @@ export class TopicsService {
      return savedTopics.toTopicsDto();
   }
 
+  async swapOrders(from: number, to: number): Promise<void> {
+    const [a, b] = await this.topicsRepository.find({
+      where: {
+        id: In([from ,to]),
+      },
+    });
+
+    const tmp = a.orders;
+    a.orders = b.orders;
+    b.orders = tmp;
+
+    await this.topicsRepository.save(a);
+    await this.topicsRepository.save(b);
+  };
+
   delete(topicsId: number) {
     this.topicsRepository.delete({ id: topicsId });
   }

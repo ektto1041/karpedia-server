@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from "@nestjs/common";
 import { TopicsService } from "./topics.service";
 import { TopicsDto } from "./dto/topics.dto";
 import { NewTopicsDto } from "./dto/new-topics.dto";
@@ -42,6 +42,11 @@ export class TopicsController {
   @Put()
   async update(@Body() topics: TopicsDto) {
     return this.topicsService.update(topics);
+  }
+
+  @Patch(':from/:to')
+  async swapOrders(@Param('from') from: number, @Param('to') to: number): Promise<void> {
+    this.topicsService.swapOrders(from, to);
   }
 
   @Delete(':id')
