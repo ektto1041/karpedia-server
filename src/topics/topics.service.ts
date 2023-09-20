@@ -10,6 +10,7 @@ import { CategoriesService } from "src/categories/categories.service";
 import { TopicsWithCategoriesResDto } from "./dto/topics-with-categories-res.dto";
 import { NewTopicsDto } from "./dto/new-topics.dto";
 import { UsersService } from "src/users/users.service";
+import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
 
 @Injectable()
 export class TopicsService {
@@ -68,13 +69,13 @@ export class TopicsService {
     return result;
   }
 
-  findAllWithPosts(): Promise<TopicsWithChaptersWithPostsDto[]> {
+  findAllWithChaptersWithPosts(): Promise<TopicsWithChaptersWithPostsDto[]> {
     return this.topicsRepository.find({
       relations: ['chaptersList', 'chaptersList.postsList', 'users'],
       select: {users: {id: true, name: true, profileImage: true}},
       order: {orders: 'DESC'},
     });
-  }
+  };
 
   async findOne(id: number): Promise<Topics> {
     return this.topicsRepository.findOne({
@@ -82,10 +83,18 @@ export class TopicsService {
     });
   };
 
-  async findOneWithChapters(id: number): Promise<TopicsWithChaptersWithPostsDto> {
+  async findOneWithChaptersWithPosts(id: number): Promise<TopicsWithChaptersWithPostsDto> {
     return this.topicsRepository.findOne({
       where: { id },
       relations: ['chaptersList', 'chaptersList.postsList', 'users'],
+      select: {users: {id: true, name: true, profileImage: true}},
+    });
+  };
+
+  async findOneWithChapters(id: number): Promise<TopicsWithChaptersDto> {
+    return this.topicsRepository.findOne({
+      where: { id },
+      relations: ['chaptersList', 'users'],
       select: {users: {id: true, name: true, profileImage: true}},
     });
   };

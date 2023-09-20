@@ -17,16 +17,24 @@ export class TopicsController {
   }
 
   @Get('posts')
-  async findAllWithPosts() {
-    return this.topicsService.findAllWithPosts();
+  async findAllWithChaptersWithPosts() {
+    return this.topicsService.findAllWithChaptersWithPosts();
   }
 
   @Get(['categories', 'setting'])
   findAllWithCategories() {
     return this.topicsService.findAllWithCategories();
   }
+
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOneWithChaptersWithPosts(@Param('id') id: number) {
+    const result = await this.topicsService.findOneWithChaptersWithPosts(id);
+
+    return result;
+  }
+
+  @Get(':id/chapters')
+  async findOneWithChapters(@Param('id') id: number) {
     const result = await this.topicsService.findOneWithChapters(id);
 
     return result;
