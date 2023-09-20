@@ -5,6 +5,7 @@ import { In, Repository } from 'typeorm';
 import { NewChaptersDto } from './dto/new-chapters.dto';
 import { TopicsService } from 'src/topics/topics.service';
 import { ChaptersDto } from './dto/chapters.dto';
+import { ChaptersWithTopicsIdDto } from './dto/chapters-with-topics-id.dto';
 
 @Injectable()
 export class ChaptersService {
@@ -33,6 +34,19 @@ export class ChaptersService {
 
   async findOneById(chapterId: number): Promise<Chapters> {
     return this.chaptersRepository.findOne({ where: { id: chapterId } });
+  };
+
+  async findOneByIdWithTopicsId(chapterId: number): Promise<ChaptersWithTopicsIdDto> {
+    return this.chaptersRepository.createQueryBuilder('Chapters')
+    .leftJoinAndSelect('Chapters.topics', 'Topics')
+    .select([
+      'Chapters.id AS id',
+      'Chapters.title AS title',
+      'Chapters.content AS content',
+      'Chapters.orders AS orders',
+      'Topics.id AS topicsId'])
+    .where('Chapters.id = :chapterId', { chapterId })
+    .getRawOne<ChaptersWithTopicsIdDto>()
   };
 
   async swapOrders(from: number, to: number): Promise<void> {

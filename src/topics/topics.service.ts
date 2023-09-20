@@ -11,6 +11,7 @@ import { TopicsWithCategoriesResDto } from "./dto/topics-with-categories-res.dto
 import { NewTopicsDto } from "./dto/new-topics.dto";
 import { UsersService } from "src/users/users.service";
 import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
+import { TopicsNameDto } from "./dto/topics-name.dto";
 
 @Injectable()
 export class TopicsService {
@@ -46,6 +47,13 @@ export class TopicsService {
       order: { orders: 'DESC' },
     });
   }
+
+  async findAllName(): Promise<TopicsNameDto[]> {
+    return await this.topicsRepository.find({
+      select: ['id', 'name', 'orders'],
+      order: { orders: 'DESC' },
+    });
+  };
 
   async findAllWithCategories(): Promise<TopicsWithCategoriesResDto> {
     // 1. find all Categories
