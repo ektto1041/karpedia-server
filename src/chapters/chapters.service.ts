@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Chapters } from './chapters.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { NewChaptersDto } from './dto/new-chapters.dto';
 import { TopicsService } from 'src/topics/topics.service';
 import { ChaptersDto } from './dto/chapters.dto';
@@ -33,5 +33,20 @@ export class ChaptersService {
 
   async findOneById(chapterId: number): Promise<Chapters> {
     return this.chaptersRepository.findOne({ where: { id: chapterId } });
+  };
+
+  async swapOrders(from: number, to: number): Promise<void> {
+    const [a, b] = await this.chaptersRepository.find({
+      where: {
+        id: In([from, to]),
+      },
+    });
+
+    const tmp = a.orders;
+    a.orders = b.orders;
+    b.orders = tmp;
+
+    await this.chaptersRepository.save(a);
+    await this.chaptersRepository.save(b);
   };
 }

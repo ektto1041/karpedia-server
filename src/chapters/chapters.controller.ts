@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { ChaptersService } from './chapters.service';
 import { NewChaptersDto } from './dto/new-chapters.dto';
 import { ChaptersDto } from './dto/chapters.dto';
@@ -12,5 +12,10 @@ export class ChaptersController {
   @Post()
   async create(@Body() newChapters: NewChaptersDto): Promise<ChaptersDto> {
     return this.chaptersService.create(newChapters);
+  };
+
+  @Patch(':from/:to')
+  async swapOrders(@Param('from') from: number, @Param('to') to: number): Promise<void> {
+    this.chaptersService.swapOrders(from, to);
   };
 };
