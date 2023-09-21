@@ -1,6 +1,5 @@
-export class ChaptersDto {
+export class ChaptersTitleDto {
   id: number;
   title: string;
-  content: string;
   orders: number;
 };

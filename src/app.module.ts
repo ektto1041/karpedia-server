@@ -57,6 +57,7 @@ export class AppModule implements NestModule {
       consumer
         .apply(AuthMiddleware)
         .forRoutes(
+          '/auths',
           '/topics/setting',
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },
@@ -64,16 +65,27 @@ export class AppModule implements NestModule {
           { path: 'topics', method: RequestMethod.POST },
           { path: 'topics', method: RequestMethod.PUT },
           { path: 'topics/:id', method: RequestMethod.DELETE },
+          { path: 'chapters', method: RequestMethod.PUT },
+          '/chapters/update/:id',
+          { path: 'posts', method: RequestMethod.PUT },
+          '/posts/update/:id',
+          '/posts/:from/:to',
         )
         .apply(AdminMiddleware)
         .forRoutes(
           '/topics/setting',
+          '/auths',
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },
           { path: 'categories/:id', method: RequestMethod.DELETE },
           { path: 'topics', method: RequestMethod.POST },
           { path: 'topics', method: RequestMethod.PUT },
           { path: 'topics/:id', method: RequestMethod.DELETE },
+          { path: 'chapters', method: RequestMethod.PUT },
+          '/chapters/update/:id',
+          { path: 'posts', method: RequestMethod.PUT },
+          '/posts/update/:id',
+          '/posts/:from/:to',
         );
   }
 }

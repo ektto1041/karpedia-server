@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { Categories } from './entities/categories.entity';
+import { In, Repository } from 'typeorm';
+import { Categories } from './entities/Categories.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesDto } from './dto/categories.dto';
 import { NewCategoriesDto } from './dto/new-categories.dto';
@@ -13,7 +13,9 @@ export class CategoriesService {
   ) {}
 
   findAll() {
-    return this.categoriesRepository.find();
+    return this.categoriesRepository.find({
+      order: {orders: 'DESC'},
+    });
   }
 
   async findById(id: number): Promise<Categories> {
@@ -22,6 +24,11 @@ export class CategoriesService {
 
   async create(newCategories: NewCategoriesDto): Promise<CategoriesDto> {
     const categories: Categories = Categories.fromNewCategoriesDto(newCategories);
+
+    // find max order
+    const maxOrder = await this.categoriesRepository.maximum('orders');
+    categories.orders = maxOrder+1;
+
     const savedCategories: Categories = await this.categoriesRepository.save(categories);
     return savedCategories.toCategoriesDto();
   }
@@ -39,6 +46,21 @@ export class CategoriesService {
     const savedCategories = await this.categoriesRepository.save(foundCategories);
 
     return savedCategories.toCategoriesDto();
+  }
+
+  async swapOrders(from: number, to: number): Promise<void> {
+    const [a, b] = await this.categoriesRepository.find({
+      where: {
+        id: In([from, to]),
+      },
+    });
+
+    const tmp = a.orders;
+    a.orders = b.orders;
+    b.orders = tmp;
+
+    await this.categoriesRepository.save(a);
+    await this.categoriesRepository.save(b);
   }
 
   delete(id: number) {

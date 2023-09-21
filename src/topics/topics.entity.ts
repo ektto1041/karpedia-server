@@ -16,6 +16,9 @@ export class Topics {
   @Column()
   description: string;
 
+  @Column()
+  orders: number;
+
   @ManyToOne(() => Users, (users) => users.id)
   users: Users;
 
@@ -29,7 +32,7 @@ export class Topics {
    * Methods
    */
   toTopicsDto() {
-    return new TopicsDto(this. id, this.name, this.description);
+    return new TopicsDto(this. id, this.name, this.description, this.orders);
   }
 
   static fromNewTopicsDto(newTopicsDto: NewTopicsDto) {

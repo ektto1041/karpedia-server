@@ -1,18 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Posts } from './posts.entity';
-import { And, ArrayContains, DataSource, DeleteResult, In, Like, QueryBuilder, Repository, SelectQueryBuilder, Transaction, UpdateResult } from 'typeorm';
-import { TopicsService } from 'src/topics/topics.service';
-import { Topics } from 'src/topics/topics.entity';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { PostsPaging } from 'src/types';
-import { PostItemResDto } from './dto/post-item-res.dto';
-import { PostItemDto } from './dto/post-item.dto';
+import { In, Repository } from 'typeorm';
 import { NewPostsDto } from './dto/new-posts.dto';
 import { ChaptersService } from 'src/chapters/chapters.service';
-
-const PAGE_SIZE = 10;
+import { NewPostsUpdateDto } from './dto/new-posts-update.dto';
 
 @Injectable()
 export class PostsService {
@@ -24,92 +16,65 @@ export class PostsService {
 
   async create(newPosts: NewPostsDto): Promise<Posts> {
     const posts = Posts.fromNewPostsDto(newPosts);
+
     const foundChapters = await this.chaptersService.findOneById(newPosts.chapterId);
     posts.chapters = foundChapters;
+
+    const {maxOrder} = await this.postsRepository.createQueryBuilder('Posts')
+      .select('MAX(Posts.orders)', 'maxOrder')
+      .where('Posts.chaptersId = :chapterId', { chapterId: foundChapters.id })
+      .getRawOne();
+    posts.orders = maxOrder+1;
+
     const savedPosts = await this.postsRepository.save(posts);
 
     return savedPosts;
   };
 
-  // async update(updatePostDto: UpdatePostDto, id: number): Promise<Posts> {
-  //   const foundPost = await this.postsRepository.findOne({
-  //     where: {id},
-  //     relations: ['topics']
-  //   });
+  async update(newPosts: NewPostsUpdateDto): Promise<Posts> {
+    const { id, title, content, chapterId } = newPosts;
 
-  //   const topicNames: string[] = updatePostDto.topics;
-  //   const savedTopics: Topics[] = await this.topicsService.create(topicNames);
+    const foundPosts = await this.postsRepository.findOne({
+      relations: { chapters: true },
+      where: { id },
+    });
 
-  //   foundPost.update(updatePostDto, savedTopics);
+    if(chapterId !== foundPosts.chapters.id) {
+      const foundChapters = await this.chaptersService.findOneById(chapterId);
+      foundPosts.chapters = foundChapters;
 
-  //   const savedPost = await this.postsRepository.save(foundPost);
+      const {maxOrder} = await this.postsRepository.createQueryBuilder('Posts')
+        .select('MAX(Posts.orders)', 'maxOrder')
+        .where('Posts.chaptersId = :chapterId', { chapterId: foundChapters.id })
+        .getRawOne();
+      foundPosts.orders = maxOrder+1;
+    }
 
-  //   return savedPost;
-  // }
-  
-  // async delete(id: number): Promise<Posts> {
-  //   const foundPost: Posts = await this.postsRepository.findOne({where: {id}});
-  //   foundPost.delete();
+    foundPosts.title = title;
+    foundPosts.content = content;
 
-  //   return this.postsRepository.save(foundPost);
-  // }
+    return await this.postsRepository.save(foundPosts);
+  };
 
-  // findAll(): Promise<Posts[]> {
-  //   return this.postsRepository.find({
-  //     where: {status: 0},
-  //     relations: ['topics'],
-  //     order: {
-  //       createdAt: 'DESC',
-  //     },
-  //   })
-  // }
+  async findOneWithChaptersWithTopicsById(postId: number): Promise<Posts> {
+    return await this.postsRepository.findOne({
+      relations: ['chapters', 'chapters.topics'],
+      where: { id: postId },
+    });
+  }
 
-  // async findAllPaging({page, keyword, topics}: PostsPaging): Promise<PostItemResDto> {
-  //   // 임시로 OR 조건 검사 하는 쿼리
-  //   const query = this.postsRepository.createQueryBuilder('post')
-  //     .leftJoin('post.topics', 'topic')
-  //     .orderBy({ ['post.createdAt']: 'DESC' })
-  //     .where('post.status = 0');
-  //   if(keyword) query.andWhere('post.title LIKE :keyword', { keyword: `%${keyword}%` });
-  //   if(topics.length > 0) query.andWhere('topic.name In (:...topics)', { topics });
-  //   query.skip(page * PAGE_SIZE).take(PAGE_SIZE);
+  async swapOrders(from: number, to: number): Promise<void> {
+    const [a, b] = await this.postsRepository.find({
+      where: {
+        id: In([from, to]),
+      },
+    });
 
-  //   const [foundPostIds, totalCount] = await query.getManyAndCount();
-  //   const foundPosts = await this.postsRepository.find({
-  //     select: {
-  //       id: true,
-  //       emoji: true,
-  //       title: true,
-  //       viewCount: true,
-  //       modifiedAt: true,
-  //       createdAt: true,
-  //     },
-  //     where: {
-  //       id: In(foundPostIds.map(p => p.id)),
-  //     },
-  //     order: {
-  //       createdAt: 'DESC'
-  //     },
-  //     relations: ['topics']
-  //   })
+    const tmp = a.orders;
+    a.orders = b.orders;
+    b.orders = tmp;
 
-  //   // 최대 페이지 수 계산
-  //   const maxPage = Math.floor(totalCount / PAGE_SIZE) - (totalCount % PAGE_SIZE === 0 ? 1 : 0);
-
-  //   return {
-  //     data: foundPosts,
-  //     maxPage,
-  //   };
-  // }
-
-  // findOne(id: number): Promise<Posts> {
-  //   return this.postsRepository.findOne({
-  //     relations: ['comments', 'topics'],
-  //     where: {id},
-  //   });
-  // };
-
-  // viewPost(id: number): Promise<UpdateResult> {
-  //   return this.postsRepository.increment({id}, "viewCount", 1);
-  // }
+    await this.postsRepository.save(a);
+    await this.postsRepository.save(b);
+  };
 }

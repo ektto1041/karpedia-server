@@ -1,15 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Topics } from "./topics.entity";
-import { In, Repository } from "typeorm";
+import { Equal, In, Repository } from "typeorm";
 import { TopicsWithCategoriesDto } from "./dto/topics-with-categories.dto";
-import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
+import { TopicsWithChaptersWithPostsDto } from "./dto/topics-with-chapters-with-posts.dto";
 import { TopicsDto } from "./dto/topics.dto";
 import { Categories } from "src/categories/entities/categories.entity";
 import { CategoriesService } from "src/categories/categories.service";
 import { TopicsWithCategoriesResDto } from "./dto/topics-with-categories-res.dto";
 import { NewTopicsDto } from "./dto/new-topics.dto";
 import { UsersService } from "src/users/users.service";
+import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
+import { TopicsNameDto } from "./dto/topics-name.dto";
 
 @Injectable()
 export class TopicsService {
@@ -26,6 +28,13 @@ export class TopicsService {
     const foundCategories = await this.categoriesService.findById(newTopics.categoriesId);
     const foundUsers = await this.usersService.findByUserId(userId);
 
+    const {maxOrder} = await this.topicsRepository.createQueryBuilder('Topics')
+      .select('MAX(Topics.orders)', 'maxOrder')
+      .where('Topics.categoriesId = :categoryId', { categoryId: foundCategories.id })
+      .getRawOne();
+    
+    topics.orders = maxOrder+1;
+
     topics.categories = foundCategories;
     topics.users = foundUsers;
 
@@ -33,10 +42,18 @@ export class TopicsService {
     return savedTopics.toTopicsDto();
   }
 
-  async findAll(): Promise<TopicsDto[]> {
-    const foundTopics = await this.topicsRepository.find();
-    return foundTopics.map(t => t.toTopicsDto());
+  async findAll(): Promise<Topics[]> {
+    return await this.topicsRepository.find({
+      order: { orders: 'DESC' },
+    });
   }
+
+  async findAllName(): Promise<TopicsNameDto[]> {
+    return await this.topicsRepository.find({
+      select: ['id', 'name', 'orders'],
+      order: { orders: 'DESC' },
+    });
+  };
 
   async findAllWithCategories(): Promise<TopicsWithCategoriesResDto> {
     // 1. find all Categories
@@ -46,7 +63,8 @@ export class TopicsService {
     const allTopics: TopicsWithCategoriesDto[] = await this.topicsRepository
       .createQueryBuilder('Topics')
       .leftJoinAndSelect('Topics.categories', 'Categories')
-      .select(['Topics.name AS name', 'Topics.id AS id', 'Topics.description AS description', 'Categories.id AS categoriesId'])
+      .select(['Topics.name AS name', 'Topics.id AS id', 'Topics.description AS description', 'Topics.orders AS orders', 'Categories.id AS categoriesId'])
+      .orderBy('orders', 'DESC')
       .getRawMany<TopicsWithCategoriesDto>();
 
     // 3. create Res DTO
@@ -59,20 +77,13 @@ export class TopicsService {
     return result;
   }
 
-  findThem(topicNames: string[]): Promise<Topics[]> {
-    return this.topicsRepository.find({
-      where: {
-        name: In(topicNames),
-      },
-    });
-  };
-
-  findAllWithPosts(): Promise<TopicsWithChaptersDto[]> {
+  findAllWithChaptersWithPosts(): Promise<TopicsWithChaptersWithPostsDto[]> {
     return this.topicsRepository.find({
       relations: ['chaptersList', 'chaptersList.postsList', 'users'],
-      select: {users: {id: true, name: true, profileImage: true}} 
+      select: {users: {id: true, name: true, profileImage: true}},
+      order: {orders: 'DESC'},
     });
-  }
+  };
 
   async findOne(id: number): Promise<Topics> {
     return this.topicsRepository.findOne({
@@ -80,11 +91,19 @@ export class TopicsService {
     });
   };
 
-  async findOneWithChapters(id: number): Promise<TopicsWithChaptersDto> {
+  async findOneWithChaptersWithPosts(id: number): Promise<TopicsWithChaptersWithPostsDto> {
     return this.topicsRepository.findOne({
       where: { id },
       relations: ['chaptersList', 'chaptersList.postsList', 'users'],
-      select: {users: {id: true, name: true, profileImage: true}} 
+      select: {users: {id: true, name: true, profileImage: true}},
+    });
+  };
+
+  async findOneWithChapters(id: number): Promise<TopicsWithChaptersDto> {
+    return this.topicsRepository.findOne({
+      where: { id },
+      relations: ['chaptersList', 'users'],
+      select: {users: {id: true, name: true, profileImage: true}},
     });
   };
 
@@ -94,6 +113,21 @@ export class TopicsService {
      const savedTopics = await this.topicsRepository.save(foundTopics);
      return savedTopics.toTopicsDto();
   }
+
+  async swapOrders(from: number, to: number): Promise<void> {
+    const [a, b] = await this.topicsRepository.find({
+      where: {
+        id: In([from ,to]),
+      },
+    });
+
+    const tmp = a.orders;
+    a.orders = b.orders;
+    b.orders = tmp;
+
+    await this.topicsRepository.save(a);
+    await this.topicsRepository.save(b);
+  };
 
   delete(topicsId: number) {
     this.topicsRepository.delete({ id: topicsId });

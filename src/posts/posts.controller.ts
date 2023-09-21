@@ -1,11 +1,18 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Get, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { NewPostsDto } from './dto/new-posts.dto';
 import { PostsDto } from './dto/posts.dto';
+import { UpdatePostsDto } from './dto/update-posts.dto';
+import { ChaptersService } from 'src/chapters/chapters.service';
+import { PostsWithChaptersIdDto } from './dto/posts-with-chapters-id.dto';
+import { NewPostsUpdateDto } from './dto/new-posts-update.dto';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly chaptersService: ChaptersService,
+  ) {}
 
   @Post()
   async create(@Body() newPosts: NewPostsDto): Promise<PostsDto> {
@@ -14,33 +21,33 @@ export class PostsController {
     return posts.toPostsDto();
   };
 
-  // @Put(':id')
-  // update(@Body() updatePostDto: UpdatePostDto, @Param('id') id: number) {
-  //   return this.postsService.update(updatePostDto, id);
-  // }
+  @Get('update/:id')
+  async getUpdatePosts(@Param('id') id: number): Promise<UpdatePostsDto> {
+    const foundPosts = await this.postsService.findOneWithChaptersWithTopicsById(id);
+    const chaptersTitles = await this.chaptersService.findAllTitleByTopic(foundPosts.chapters.topics);
+    const posts: PostsWithChaptersIdDto = {
+      id: foundPosts.id,
+      title: foundPosts.title,
+      content: foundPosts.content,
+      orders: foundPosts.orders,
+      chaptersId: foundPosts.chapters.id,
+    };
 
-  // @Delete(':id')
-  // delete(@Param('id') id: number) {
-  //   return this.postsService.delete(id);
-  // }
+    return {
+      chaptersList: chaptersTitles,
+      posts: posts,
+    };
+  };
 
-  // @Get()
-  // findAll() {
-  //   return this.postsService.findAll();
-  // }
+  @Put()
+  async update(@Body() newPosts: NewPostsUpdateDto): Promise<PostsDto> {
+    const savedPosts = await this.postsService.update(newPosts);
 
-  // @Get('paging')
-  // findAllPaging(@Query('page') page: number, @Query('keyword') keyword: string, @Query('topics') topics: string) {
-  //   return this.postsService.findAllPaging({page, keyword, topics: topics ? topics.split(',') : []});
-  // }
+    return savedPosts.toPostsDto();
+  };
 
-  // @Get(':id')
-  // findOne(@Param('id') id: number) {
-  //   return this.postsService.findOne(id);
-  // }
-
-  // @Put('view/:id')
-  // viewPost(@Param('id') id: number) {
-  //   return this.postsService.viewPost(id);
-  // }
+  @Patch(':from/:to')
+  async swapOrders(@Param('from') from: number, @Param('to') to: number): Promise<void> {
+    await this.postsService.swapOrders(from, to);
+  }
 }

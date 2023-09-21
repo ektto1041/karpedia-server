@@ -10,6 +10,9 @@ export class Categories {
   @Column()
   name: string;
 
+  @Column()
+  orders: number;
+
   // No Topics
   // 카테고리 이름만 가져오는 쿼리가 있기 때문
 
@@ -17,7 +20,7 @@ export class Categories {
    * Methods
    */
   toCategoriesDto(): CategoriesDto {
-    return new CategoriesDto(this.id, this.name);
+    return new CategoriesDto(this.id, this.name, this.orders);
   }
 
   static fromNewCategoriesDto(newCategoriesDto: NewCategoriesDto) {
