@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Chapters } from './chapters.entity';
-import { In, Repository } from 'typeorm';
+import { Equal, In, Repository } from 'typeorm';
 import { NewChaptersDto } from './dto/new-chapters.dto';
 import { TopicsService } from 'src/topics/topics.service';
 import { ChaptersDto } from './dto/chapters.dto';
 import { ChaptersWithTopicsIdDto } from './dto/chapters-with-topics-id.dto';
 import { NewChaptersUpdateDto } from './dto/new-chapters-update.dto';
+import { ChaptersTitleDto } from './dto/chapters-title.dto';
+import { Topics } from 'src/topics/topics.entity';
 
 @Injectable()
 export class ChaptersService {
@@ -48,6 +50,14 @@ export class ChaptersService {
       'Topics.id AS topicsId'])
     .where('Chapters.id = :chapterId', { chapterId })
     .getRawOne<ChaptersWithTopicsIdDto>()
+  };
+
+  async findAllTitleByTopic(topics: Topics): Promise<ChaptersTitleDto[]> {
+    return await this.chaptersRepository.find({
+      select: ['id', 'title', 'orders'],
+      where: { topics: { id: topics.id} },
+      order: { orders: 'DESC' },
+    });
   };
 
   async update(newChapters: NewChaptersUpdateDto): Promise<Chapters> {

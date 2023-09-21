@@ -4,6 +4,7 @@ import { Posts } from './posts.entity';
 import { In, Repository } from 'typeorm';
 import { NewPostsDto } from './dto/new-posts.dto';
 import { ChaptersService } from 'src/chapters/chapters.service';
+import { NewPostsUpdateDto } from './dto/new-posts-update.dto';
 
 @Injectable()
 export class PostsService {
@@ -29,6 +30,32 @@ export class PostsService {
 
     return savedPosts;
   };
+
+  async update(newPosts: NewPostsUpdateDto): Promise<Posts> {
+    const { id, title, content, chapterId } = newPosts;
+
+    const foundPosts = await this.postsRepository.findOne({
+      relations: { chapters: true },
+      where: { id },
+    });
+
+    if(chapterId !== foundPosts.chapters.id) {
+      const foundChapters = await this.chaptersService.findOneById(chapterId);
+      foundPosts.chapters = foundChapters;
+    }
+
+    foundPosts.title = title;
+    foundPosts.content = content;
+
+    return await this.postsRepository.save(foundPosts);
+  };
+
+  async findOneWithChaptersWithTopicsById(postId: number): Promise<Posts> {
+    return await this.postsRepository.findOne({
+      relations: ['chapters', 'chapters.topics'],
+      where: { id: postId },
+    });
+  }
 
   async swapOrders(from: number, to: number): Promise<void> {
     const [a, b] = await this.postsRepository.find({
