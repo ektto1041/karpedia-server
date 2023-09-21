@@ -1,4 +1,4 @@
-import { Categories } from "../entities/categories.entity";
+import { Categories } from "../categories.entity";
 
 export class NewCategoriesDto {
   name: string;

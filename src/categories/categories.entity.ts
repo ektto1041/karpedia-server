@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { CategoriesDto } from "../dto/categories.dto";
-import { NewCategoriesDto } from "../dto/new-categories.dto";
+import { CategoriesDto } from "./dto/categories.dto";
+import { NewCategoriesDto } from "./dto/new-categories.dto";
 
 @Entity()
 export class Categories {
