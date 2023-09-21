@@ -5,7 +5,7 @@ import { Equal, In, Repository } from "typeorm";
 import { TopicsWithCategoriesDto } from "./dto/topics-with-categories.dto";
 import { TopicsWithChaptersWithPostsDto } from "./dto/topics-with-chapters-with-posts.dto";
 import { TopicsDto } from "./dto/topics.dto";
-import { Categories } from "src/categories/entities/Categories.entity";
+import { Categories } from "src/categories/entities/categories.entity";
 import { CategoriesService } from "src/categories/categories.service";
 import { TopicsWithCategoriesResDto } from "./dto/topics-with-categories-res.dto";
 import { NewTopicsDto } from "./dto/new-topics.dto";

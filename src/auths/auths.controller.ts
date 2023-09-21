@@ -35,6 +35,7 @@ export class AuthsController {
       include_granted_scopes: true,
     });
 
+    res.header('Cache-Control', 'no-cache');
     res.redirect(301, authrizationUrl);
   }
 
@@ -42,6 +43,7 @@ export class AuthsController {
   async googleCallback(@Res() res: Response, @Query('code') code: string) {
     const token = await this.oauth2Client.getToken(code);
 
+    
     const newUsers: CreateUserDto = {
       serviceId: '',
       name: '',
@@ -61,17 +63,18 @@ export class AuthsController {
     if(foundUsers) {
       foundUsers.refreshToken = newUsers.refreshToken;
       await this.usersService.update(foundUsers);
-      res.cookie('uid', foundUsers.id);
+      res.cookie('uid', foundUsers.id, { domain: '.karpedia.site' });
 
       // if admin
-      if(foundUsers.authority === 1) res.cookie('is_admin', '1');
+      if(foundUsers.authority === 1) res.cookie('is_admin', '1', { domain: '.karpedia.site' });
     } else {
       const createdUsers = await this.usersService.create(newUsers);
-      res.cookie('uid', createdUsers.id);
+      res.cookie('uid', createdUsers.id, { domain: '.karpedia.site' });
     }
     
-    res.cookie('at', token.tokens.access_token);
-    res.cookie('rt', token.tokens.refresh_token);
+    res.cookie('at', token.tokens.access_token, { domain: '.karpedia.site' });
+    res.cookie('rt', token.tokens.refresh_token, { domain: '.karpedia.site' });
+    res.header('Cache-Control', 'no-cache');
     res.redirect(301, this.configService.get('CLIENT_URI'));
   }
 

@@ -12,7 +12,7 @@ import { AuthsModule } from './auths/auths.module';
 import { Users } from './users/entities/users.entity';
 import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
-import { Categories } from './categories/entities/Categories.entity';
+import { Categories } from './categories/entities/categories.entity';
 import { ChaptersModule } from './chapters/chapters.module';
 import { Chapters } from './chapters/chapters.entity';
 import { AdminMiddleware } from './middleware/admin.middleware';
