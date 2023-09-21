@@ -42,6 +42,12 @@ export class PostsService {
     if(chapterId !== foundPosts.chapters.id) {
       const foundChapters = await this.chaptersService.findOneById(chapterId);
       foundPosts.chapters = foundChapters;
+
+      const {maxOrder} = await this.postsRepository.createQueryBuilder('Posts')
+        .select('MAX(Posts.orders)', 'maxOrder')
+        .where('Posts.chaptersId = :chapterId', { chapterId: foundChapters.id })
+        .getRawOne();
+      foundPosts.orders = maxOrder+1;
     }
 
     foundPosts.title = title;

@@ -55,7 +55,7 @@ export class ChaptersService {
   async findAllTitleByTopic(topics: Topics): Promise<ChaptersTitleDto[]> {
     return await this.chaptersRepository.find({
       select: ['id', 'title', 'orders'],
-      where: { topics: { id: topics.id} },
+      where: { topics: { id: topics.id } },
       order: { orders: 'DESC' },
     });
   };
@@ -74,6 +74,12 @@ export class ChaptersService {
     if(foundChapters.topics.id !== newChapters.topicId) {
       const foundTopics = await this.topicsService.findOne(newChapters.topicId);
       foundChapters.topics = foundTopics;
+
+      const {maxOrder} = await this.chaptersRepository.createQueryBuilder('Chapters')
+        .select('MAX(Chapters.orders)', 'maxOrder')
+        .where('Chapters.topicsId = :topicId', { topicId: foundTopics.id })
+        .getRawOne();
+      foundChapters.orders = maxOrder+1;
     }
     
     return await this.chaptersRepository.save(foundChapters);
