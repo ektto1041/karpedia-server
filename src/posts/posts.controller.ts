@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { NewPostsDto } from './dto/new-posts.dto';
 import { PostsDto } from './dto/posts.dto';
@@ -14,33 +14,8 @@ export class PostsController {
     return posts.toPostsDto();
   };
 
-  // @Put(':id')
-  // update(@Body() updatePostDto: UpdatePostDto, @Param('id') id: number) {
-  //   return this.postsService.update(updatePostDto, id);
-  // }
-
-  // @Delete(':id')
-  // delete(@Param('id') id: number) {
-  //   return this.postsService.delete(id);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.postsService.findAll();
-  // }
-
-  // @Get('paging')
-  // findAllPaging(@Query('page') page: number, @Query('keyword') keyword: string, @Query('topics') topics: string) {
-  //   return this.postsService.findAllPaging({page, keyword, topics: topics ? topics.split(',') : []});
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: number) {
-  //   return this.postsService.findOne(id);
-  // }
-
-  // @Put('view/:id')
-  // viewPost(@Param('id') id: number) {
-  //   return this.postsService.viewPost(id);
-  // }
+  @Patch(':from/:to')
+  async swapOrders(@Param('from') from: number, @Param('to') to: number): Promise<void> {
+    await this.postsService.swapOrders(from, to);
+  }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Posts } from './posts.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { NewPostsDto } from './dto/new-posts.dto';
 import { ChaptersService } from 'src/chapters/chapters.service';
 
@@ -28,5 +28,20 @@ export class PostsService {
     const savedPosts = await this.postsRepository.save(posts);
 
     return savedPosts;
+  };
+
+  async swapOrders(from: number, to: number): Promise<void> {
+    const [a, b] = await this.postsRepository.find({
+      where: {
+        id: In([from, to]),
+      },
+    });
+
+    const tmp = a.orders;
+    a.orders = b.orders;
+    b.orders = tmp;
+
+    await this.postsRepository.save(a);
+    await this.postsRepository.save(b);
   };
 }
