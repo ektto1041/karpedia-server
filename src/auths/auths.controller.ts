@@ -21,7 +21,7 @@ export class AuthsController {
   );
 
   // Middleware 를 통해 로그인&어드민을 체크하는 API
-  @Get()
+  @Get('check')
   checkAuth() {}
 
   @Get('google')
@@ -43,7 +43,8 @@ export class AuthsController {
   async googleCallback(@Res() res: Response, @Query('code') code: string) {
     const token = await this.oauth2Client.getToken(code);
 
-    
+    const isProd = this.configService.get('NODE_ENV') === 'prod';
+
     const newUsers: CreateUserDto = {
       serviceId: '',
       name: '',
@@ -63,17 +64,17 @@ export class AuthsController {
     if(foundUsers) {
       foundUsers.refreshToken = newUsers.refreshToken;
       await this.usersService.update(foundUsers);
-      res.cookie('uid', foundUsers.id, { domain: '.karpedia.site' });
+      res.cookie('uid', foundUsers.id, { domain: isProd ? '.karpedia.site' : undefined });
 
       // if admin
-      if(foundUsers.authority === 1) res.cookie('is_admin', '1', { domain: '.karpedia.site' });
+      if(foundUsers.authority === 1) res.cookie('is_admin', '1', { domain: isProd ? '.karpedia.site' : undefined });
     } else {
       const createdUsers = await this.usersService.create(newUsers);
-      res.cookie('uid', createdUsers.id, { domain: '.karpedia.site' });
+      res.cookie('uid', createdUsers.id, { domain: isProd ? '.karpedia.site' : undefined });
     }
     
-    res.cookie('at', token.tokens.access_token, { domain: '.karpedia.site' });
-    res.cookie('rt', token.tokens.refresh_token, { domain: '.karpedia.site' });
+    res.cookie('at', token.tokens.access_token, { domain: isProd ? '.karpedia.site' : undefined });
+    res.cookie('rt', token.tokens.refresh_token, { domain: isProd ? '.karpedia.site' : undefined });
     res.header('Cache-Control', 'no-cache');
     res.redirect(301, this.configService.get('CLIENT_URI'));
   }
