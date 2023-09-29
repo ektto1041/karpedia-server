@@ -1,27 +1,13 @@
-import { Posts } from "src/posts/posts.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { CreateCommentsDto } from "./dto/create-comments.dto";
-import { repl } from "@nestjs/core";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Users } from "src/users/entities/users.entity";
 
 @Entity()
 export class Comments {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
-
-  @Column()
-  password: string;
-
-  @Column()
+  @Column({ length: 1500 })
   content: string;
-
-  @Column()
-  reply: string;
-
-  @Column({type: 'integer', width: 1})
-  status: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -29,26 +15,12 @@ export class Comments {
   @UpdateDateColumn()
   modifiedAt: Date;
 
-  // @ManyToOne(() => Posts, post => post.comments)
-  // post: Posts;
+  @ManyToOne(() => Users, (users) => users.id)
+  users: Users;
 
-  // methods
-  // static create(createCommentsDto: CreateCommentsDto, post: Posts): Comments {
-  //   const newComment = new Comments();
-  //   newComment.name = createCommentsDto.name;
-  //   newComment.password = createCommentsDto.password;
-  //   newComment.content = createCommentsDto.content;
-  //   newComment.reply = '';
-  //   newComment.status = 0;
-  //   newComment.post = post;
-  //   return newComment;
-  // }
+  @ManyToOne(() => Comments, comments => comments.id)
+  replyTo: Comments;
 
-  // updateReply(reply: string): void {
-  //   this.reply = reply;
-  // }
-
-  // delete(): void {
-  //   this.status = 1;
-  // }
+  @OneToMany(() => Comments, comments => comments.replyTo)
+  replies: Comments[];
 }

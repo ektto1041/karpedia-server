@@ -1,5 +1,4 @@
-import { Comments } from "src/comments/comments.entity";
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { CreateUserDto } from "../dto/create-user.dto";
 
 @Entity()

@@ -30,7 +30,7 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
     entities: [Users, Posts, Topics, Comments, Categories, Chapters],
     logging: true,
     // In Production, shoule be false
-    synchronize: configService.get('NODE_ENV') === 'prod' ? false : true,
+    synchronize: configService.get('NODE_ENV') === 'prod' ? false : false,
   })
 })
 
