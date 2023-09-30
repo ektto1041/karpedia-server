@@ -56,6 +56,14 @@ export class PostsService {
     return await this.postsRepository.save(foundPosts);
   };
 
+  async findById(postsId: number): Promise<Posts> {
+    return await this.postsRepository.findOne({
+      where: {
+        id: postsId,
+      },
+    });
+  };
+
   async findOneWithChaptersWithTopicsById(postId: number): Promise<Posts> {
     return await this.postsRepository.findOne({
       relations: ['chapters', 'chapters.topics'],

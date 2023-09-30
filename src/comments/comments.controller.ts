@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
-import { CreateCommentsDto } from "./dto/create-comments.dto";
-import { UpdateRepliesDto } from "./dto/update-replies.dto";
+import { NewCommentsDto } from "./dto/new-comments.dto";
+import { Request, Response } from "express";
 
 @Controller('comments')
 export class CommentsController {
@@ -9,28 +9,13 @@ export class CommentsController {
     private readonly commentsService: CommentsService,
   ) {}
 
-  // @Post()
-  // create(@Body() createCommentsDto: CreateCommentsDto) {
-  //   return this.commentsService.create(createCommentsDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.commentsService.findAll();
-  // }
-
-  // @Get('/posts/:postId')
-  // findAllByPostId(@Param('postId') postId: number) {
-  //   return this.commentsService.findAllByPostId(postId);
-  // }
-
-  // @Put('/reply/:id')
-  // updateReply(@Body() UpdateRepliesDto: UpdateRepliesDto, @Param('id') id: number) {
-  //   return this.commentsService.updateReply(UpdateRepliesDto, id);
-  // }
-
-  // @Delete(':id')
-  // delete(@Param('id') id: number) {
-  //   return this.commentsService.delete(id);
-  // }
+  @Post()
+  async create(@Body() newComments: NewCommentsDto, @Req() req: Request, @Res() res: Response) {
+    if(req.cookies.uid) {
+      const comments = await this.commentsService.create(newComments, parseInt(req.cookies.uid));
+      res.status(201).send(comments.toCommentsDto());
+    } else {
+      res.status(400).send();
+    }
+  }
 }

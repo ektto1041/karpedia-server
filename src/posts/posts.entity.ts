@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, One
 import { Chapters } from "src/chapters/chapters.entity";
 import { NewPostsDto } from "./dto/new-posts.dto";
 import { PostsDto } from "./dto/posts.dto";
+import { Comments } from "src/comments/comments.entity";
 
 @Entity()
 export class Posts {
@@ -30,11 +31,11 @@ export class Posts {
   @UpdateDateColumn()
   modifiedAt: Date;
 
-  // @OneToMany(() => Comments, comment => comment.post)
-  // comments: Comments[];
-
   @ManyToOne(() => Chapters, chapters => chapters.id, { onDelete: 'CASCADE' })
   chapters: Chapters;
+
+  @OneToMany(() => Comments, comment => comment.posts)
+  commentsList: Comments[];
 
   /**
    * Methods
