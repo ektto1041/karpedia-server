@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Users } from "src/users/entities/users.entity";
 import { NewCommentsDto } from "./dto/new-comments.dto";
 import { CommentsDto } from "./dto/comments.dto";
 import { Posts } from "src/posts/posts.entity";
+import { Users } from "src/users/users.entity";
 
 @Entity()
 export class Comments {
