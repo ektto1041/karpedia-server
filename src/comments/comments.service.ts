@@ -6,6 +6,7 @@ import { PostsService } from "src/posts/posts.service";
 import { CommentsDto } from "./dto/comments.dto";
 import { NewCommentsDto } from "./dto/new-comments.dto";
 import { UsersService } from "src/users/users.service";
+import { CommentsWithPublicUsersDto } from "./dto/comments-with-public-users.dto";
 
 @Injectable()
 export class CommentsService {
@@ -37,5 +38,13 @@ export class CommentsService {
     } 
 
     return await this.commentsRepository.save(comments);
+  }
+
+  async findAllWithPublicUsersByPostsId(postsId: number): Promise<CommentsWithPublicUsersDto[]> {
+    return await this.commentsRepository.find({
+      relations: ['users'],
+      where: { posts: {id: postsId} },
+      select: {users: {id: true, name: true, profileImage: true}},
+    });
   }
 }

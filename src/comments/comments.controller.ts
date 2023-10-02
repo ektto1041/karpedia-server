@@ -2,12 +2,18 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from "@nest
 import { CommentsService } from "./comments.service";
 import { NewCommentsDto } from "./dto/new-comments.dto";
 import { Request, Response } from "express";
+import { CommentsWithPublicUsersDto } from "./dto/comments-with-public-users.dto";
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService,
   ) {}
+
+  @Get(':postId')
+  async findAllWithPublicUsersByPostsId(@Param('postId') postsId: number): Promise<CommentsWithPublicUsersDto[]> {
+    return await this.commentsService.findAllWithPublicUsersByPostsId(postsId);
+  };
 
   @Post()
   async create(@Body() newComments: NewCommentsDto, @Req() req: Request, @Res() res: Response) {
