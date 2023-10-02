@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Observable } from 'rxjs';
 import { And, ArrayContains, DataSource, DeleteResult, In, Like, QueryBuilder, Repository, SelectQueryBuilder, Transaction, UpdateResult } from 'typeorm';
-import { Users } from './entities/users.entity';
+import { Users } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class UsersService {
     return await this.usersRepository.findOneBy({ serviceId });
   }
 
-  async findByUserId(userId: number) {
+  async findByUserId(userId: number): Promise<Users> {
     return await this.usersRepository.findOneBy({ id: userId });
   }
 }

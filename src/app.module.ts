@@ -9,7 +9,7 @@ import { TopicsModule } from './topics/topics.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthsModule } from './auths/auths.module';
-import { Users } from './users/entities/users.entity';
+import { Users } from './users/users.entity';
 import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
 import { Categories } from './categories/categories.entity';
@@ -58,6 +58,7 @@ export class AppModule implements NestModule {
         .apply(AuthMiddleware)
         .forRoutes(
           '/auths/check',
+          { path: 'users/self', method: RequestMethod.GET },
           '/topics/setting',
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },
