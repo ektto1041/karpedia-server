@@ -1,7 +1,7 @@
 import { Injectable, Logger, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { AuthsService } from "src/auths/auths.service";
-import { Users } from "src/users/entities/users.entity";
+import { Users } from "src/users/users.entity";
 import { UsersService } from "src/users/users.service";
 
 @Injectable()
