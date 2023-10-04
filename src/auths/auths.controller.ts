@@ -26,7 +26,7 @@ export class AuthsController {
 
   @Get('google')
   googleLogin(@Res() res: Response) {
-    const scopes = [ 'https://www.googleapis.com/auth/userinfo.profile' ];
+    const scopes = [ 'https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email' ];
 
     const authrizationUrl: string = this.oauth2Client.generateAuthUrl({
       prompt: 'consent',
