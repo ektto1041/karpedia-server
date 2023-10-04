@@ -25,7 +25,7 @@ export class CommentsService {
     comments.users = foundUsers;
 
     // posts
-    const foundPosts = await this.postsService.findById(newComments.postsId);
+    const foundPosts = await this.postsService.findOneById(newComments.postsId);
     comments.posts = foundPosts;
 
     // replyTo
