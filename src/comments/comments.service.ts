@@ -6,6 +6,7 @@ import { PostsService } from "src/posts/posts.service";
 import { NewCommentsDto } from "./dto/new-comments.dto";
 import { UsersService } from "src/users/users.service";
 import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
+import { NewCommentsUpdateDto } from "./dto/new-comments-update.dto";
 
 @Injectable()
 export class CommentsService {
@@ -48,5 +49,15 @@ export class CommentsService {
         replyTo: {id: true, content: true, createdAt: true, modifiedAt: true, users: {id: true, name: true, profileImage: true}}
       },
     });
+  }
+
+  async update(newComments: NewCommentsUpdateDto): Promise<Comments> {
+    const foundComments = await this.commentsRepository.findOne({
+      where: {id: newComments.id},
+    });
+
+    foundComments.content = newComments.content;
+
+    return await this.commentsRepository.save(foundComments);
   }
 }

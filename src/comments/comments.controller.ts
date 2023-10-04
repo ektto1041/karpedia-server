@@ -3,6 +3,8 @@ import { CommentsService } from "./comments.service";
 import { NewCommentsDto } from "./dto/new-comments.dto";
 import { Request, Response } from "express";
 import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
+import { NewCommentsUpdateDto } from "./dto/new-comments-update.dto";
+import { CommentsDto } from "./dto/comments.dto";
 
 @Controller('comments')
 export class CommentsController {
@@ -23,5 +25,10 @@ export class CommentsController {
     } else {
       res.status(400).send();
     }
+  }
+
+  @Put()
+  async update(@Body() newComments: NewCommentsUpdateDto): Promise<CommentsDto> {
+    return (await this.commentsService.update(newComments)).toCommentsDto();
   }
 }

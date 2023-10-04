@@ -72,6 +72,7 @@ export class AppModule implements NestModule {
           '/posts/update/:id',
           '/posts/:from/:to',
           { path: 'comments', method: RequestMethod.POST },
+          { path: 'comments', method: RequestMethod.PUT },
         )
         .apply(AdminMiddleware)
         .forRoutes(
