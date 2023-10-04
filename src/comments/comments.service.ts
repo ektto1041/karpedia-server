@@ -1,62 +1,67 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Comments } from "./comments.entity";
-import { CreateCommentsDto } from "./dto/create-comments.dto";
 import { PostsService } from "src/posts/posts.service";
-import { Posts } from "src/posts/posts.entity";
-import { repl } from "@nestjs/core";
-import { UpdateRepliesDto } from "./dto/update-replies.dto";
+import { NewCommentsDto } from "./dto/new-comments.dto";
+import { UsersService } from "src/users/users.service";
+import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
+import { NewCommentsUpdateDto } from "./dto/new-comments-update.dto";
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comments)
     private readonly commentsRepository: Repository<Comments>,
+    private readonly usersService: UsersService,
     private readonly postsService: PostsService,
   ) {}
 
-  // async create(createCommentsDto: CreateCommentsDto): Promise<Comments> {
-  //   const foundPost: Posts = await this.postsService.findOne(createCommentsDto.postId);
-  //   const newComments: Comments = Comments.create(createCommentsDto, foundPost);
-    
-  //   return this.commentsRepository.save(newComments);
-  // }
+  async create(newComments: NewCommentsDto, usersId: number): Promise<Comments> {
+    const comments = Comments.fromNewCommentsDto(newComments);
 
-  // findAll(): Promise<Comments[]> {
-  //   return this.commentsRepository.find({
-  //     relations: ["post"],
-  //   });
-  // }
-  
-  // findAllByPostId(postId: number): Promise<Comments[]> {
-  //   return this.commentsRepository.find({
-  //     where: {post: {id: postId}},
-  //     relations: ['post']
-  //   });
-  // }
+    // users
+    const foundUsers = await this.usersService.findByUserId(usersId);
+    comments.users = foundUsers;
 
-  // async updateReply(updateRepliesDto: UpdateRepliesDto, id: number): Promise<Comments> {
-  //   const foundComment = await this.commentsRepository.findOne({
-  //     where: {id, status: 0},
-  //   });
+    // posts
+    const foundPosts = await this.postsService.findById(newComments.postsId);
+    comments.posts = foundPosts;
 
-  //   if(!foundComment) throw new HttpException('NotFoundComment', HttpStatus.NOT_FOUND);
+    // replyTo
+    if(newComments.replyToId) {
+      const foundComments = await this.commentsRepository.findOne({
+        where: { id: newComments.replyToId },
+      });
 
-  //   foundComment.updateReply(updateRepliesDto.reply);
+      comments.replyTo = foundComments;
+    } 
 
-  //   return this.commentsRepository.save(foundComment);
-  // }
+    return await this.commentsRepository.save(comments);
+  }
 
-  // async delete(id: number): Promise<Comments> {
-  //   const foundComment = await this.commentsRepository.findOne({
-  //     where: {id},
-  //   });
+  async findAllWithPublicUsersWithReplyToByPostsId(postsId: number): Promise<CommentsWithPublicUsersWithReplyToDto[]> {
+    return await this.commentsRepository.find({
+      relations: ['users', 'replyTo', 'replyTo.users'],
+      where: { posts: {id: postsId} },
+      select: {
+        users: {id: true, name: true, profileImage: true},
+        replyTo: {id: true, content: true, createdAt: true, modifiedAt: true, users: {id: true, name: true, profileImage: true}}
+      },
+    });
+  }
 
-  //   if(!foundComment) throw new HttpException('NotFoundComment', HttpStatus.NOT_FOUND);
+  async update(newComments: NewCommentsUpdateDto): Promise<Comments> {
+    const foundComments = await this.commentsRepository.findOne({
+      where: {id: newComments.id},
+    });
 
-  //   foundComment.delete();
+    foundComments.content = newComments.content;
 
-  //   return this.commentsRepository.save(foundComment);
-  // }
+    return await this.commentsRepository.save(foundComments);
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.commentsRepository.delete({ id });
+  }
 }

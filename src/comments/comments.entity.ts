@@ -1,27 +1,16 @@
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { NewCommentsDto } from "./dto/new-comments.dto";
+import { CommentsDto } from "./dto/comments.dto";
 import { Posts } from "src/posts/posts.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { CreateCommentsDto } from "./dto/create-comments.dto";
-import { repl } from "@nestjs/core";
+import { Users } from "src/users/users.entity";
 
 @Entity()
 export class Comments {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
-
-  @Column()
-  password: string;
-
-  @Column()
+  @Column({ length: 1500 })
   content: string;
-
-  @Column()
-  reply: string;
-
-  @Column({type: 'integer', width: 1})
-  status: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -29,26 +18,34 @@ export class Comments {
   @UpdateDateColumn()
   modifiedAt: Date;
 
-  // @ManyToOne(() => Posts, post => post.comments)
-  // post: Posts;
+  @ManyToOne(() => Posts, posts => posts.id)
+  posts: Posts;
 
-  // methods
-  // static create(createCommentsDto: CreateCommentsDto, post: Posts): Comments {
-  //   const newComment = new Comments();
-  //   newComment.name = createCommentsDto.name;
-  //   newComment.password = createCommentsDto.password;
-  //   newComment.content = createCommentsDto.content;
-  //   newComment.reply = '';
-  //   newComment.status = 0;
-  //   newComment.post = post;
-  //   return newComment;
-  // }
+  @ManyToOne(() => Users, (users) => users.id)
+  users: Users;
 
-  // updateReply(reply: string): void {
-  //   this.reply = reply;
-  // }
+  @ManyToOne(() => Comments, comments => comments.id, { onDelete: 'CASCADE' })
+  replyTo: Comments;
 
-  // delete(): void {
-  //   this.status = 1;
-  // }
+  @OneToMany(() => Comments, comments => comments.replyTo)
+  replies: Comments[];
+
+  /**
+   * Methods
+   */
+  static fromNewCommentsDto(newComments: NewCommentsDto): Comments {
+    const comments = new Comments();
+    comments.content = newComments.content;
+    return comments;
+  };
+
+  toCommentsDto(): CommentsDto {
+    const commentsDto = new CommentsDto();
+    commentsDto.id = this.id;
+    commentsDto.content = this.content;
+    commentsDto.createdAt = this.createdAt;
+    commentsDto.modifiedAt = this.modifiedAt;
+
+    return commentsDto;
+  }
 }

@@ -1,7 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
-import { CreateCommentsDto } from "./dto/create-comments.dto";
-import { UpdateRepliesDto } from "./dto/update-replies.dto";
+import { NewCommentsDto } from "./dto/new-comments.dto";
+import { Request, Response } from "express";
+import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
+import { NewCommentsUpdateDto } from "./dto/new-comments-update.dto";
+import { CommentsDto } from "./dto/comments.dto";
 
 @Controller('comments')
 export class CommentsController {
@@ -9,28 +12,28 @@ export class CommentsController {
     private readonly commentsService: CommentsService,
   ) {}
 
-  // @Post()
-  // create(@Body() createCommentsDto: CreateCommentsDto) {
-  //   return this.commentsService.create(createCommentsDto);
-  // }
+  @Get(':postId')
+  async findAllWithPublicUsersWithReplyToIdByPostsId(@Param('postId') postsId: number): Promise<CommentsWithPublicUsersWithReplyToDto[]> {
+    return await this.commentsService.findAllWithPublicUsersWithReplyToByPostsId(postsId);
+  };
 
-  // @Get()
-  // findAll() {
-  //   return this.commentsService.findAll();
-  // }
+  @Post()
+  async create(@Body() newComments: NewCommentsDto, @Req() req: Request, @Res() res: Response) {
+    if(req.cookies.uid) {
+      const comments = await this.commentsService.create(newComments, parseInt(req.cookies.uid));
+      res.status(201).send(comments.toCommentsDto());
+    } else {
+      res.status(400).send();
+    }
+  }
 
-  // @Get('/posts/:postId')
-  // findAllByPostId(@Param('postId') postId: number) {
-  //   return this.commentsService.findAllByPostId(postId);
-  // }
+  @Put()
+  async update(@Body() newComments: NewCommentsUpdateDto): Promise<CommentsDto> {
+    return (await this.commentsService.update(newComments)).toCommentsDto();
+  }
 
-  // @Put('/reply/:id')
-  // updateReply(@Body() UpdateRepliesDto: UpdateRepliesDto, @Param('id') id: number) {
-  //   return this.commentsService.updateReply(UpdateRepliesDto, id);
-  // }
-
-  // @Delete(':id')
-  // delete(@Param('id') id: number) {
-  //   return this.commentsService.delete(id);
-  // }
+  @Delete(':id')
+  async delete(@Param('id') id: number): Promise<void> {
+    await this.commentsService.delete(id);
+  }
 }

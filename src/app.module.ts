@@ -30,7 +30,7 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
     entities: [Users, Posts, Topics, Comments, Categories, Chapters],
     logging: true,
     // In Production, shoule be false
-    synchronize: configService.get('NODE_ENV') === 'prod' ? false : true,
+    synchronize: configService.get('NODE_ENV') === 'prod' ? false : false,
   })
 })
 
@@ -71,6 +71,9 @@ export class AppModule implements NestModule {
           { path: 'posts', method: RequestMethod.PUT },
           '/posts/update/:id',
           '/posts/:from/:to',
+          { path: 'comments', method: RequestMethod.POST },
+          { path: 'comments', method: RequestMethod.PUT },
+          { path: 'comments/:id', method: RequestMethod.DELETE },
         )
         .apply(AdminMiddleware)
         .forRoutes(
