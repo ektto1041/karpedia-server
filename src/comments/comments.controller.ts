@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from "@nest
 import { CommentsService } from "./comments.service";
 import { NewCommentsDto } from "./dto/new-comments.dto";
 import { Request, Response } from "express";
-import { CommentsWithPublicUsersDto } from "./dto/comments-with-public-users.dto";
+import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
 
 @Controller('comments')
 export class CommentsController {
@@ -11,8 +11,8 @@ export class CommentsController {
   ) {}
 
   @Get(':postId')
-  async findAllWithPublicUsersByPostsId(@Param('postId') postsId: number): Promise<CommentsWithPublicUsersDto[]> {
-    return await this.commentsService.findAllWithPublicUsersByPostsId(postsId);
+  async findAllWithPublicUsersWithReplyToIdByPostsId(@Param('postId') postsId: number): Promise<CommentsWithPublicUsersWithReplyToDto[]> {
+    return await this.commentsService.findAllWithPublicUsersWithReplyToByPostsId(postsId);
   };
 
   @Post()

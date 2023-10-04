@@ -3,10 +3,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Comments } from "./comments.entity";
 import { PostsService } from "src/posts/posts.service";
-import { CommentsDto } from "./dto/comments.dto";
 import { NewCommentsDto } from "./dto/new-comments.dto";
 import { UsersService } from "src/users/users.service";
-import { CommentsWithPublicUsersDto } from "./dto/comments-with-public-users.dto";
+import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
 
 @Injectable()
 export class CommentsService {
@@ -40,11 +39,14 @@ export class CommentsService {
     return await this.commentsRepository.save(comments);
   }
 
-  async findAllWithPublicUsersByPostsId(postsId: number): Promise<CommentsWithPublicUsersDto[]> {
+  async findAllWithPublicUsersWithReplyToByPostsId(postsId: number): Promise<CommentsWithPublicUsersWithReplyToDto[]> {
     return await this.commentsRepository.find({
-      relations: ['users'],
+      relations: ['users', 'replyTo', 'replyTo.users'],
       where: { posts: {id: postsId} },
-      select: {users: {id: true, name: true, profileImage: true}},
+      select: {
+        users: {id: true, name: true, profileImage: true},
+        replyTo: {id: true, content: true, createdAt: true, modifiedAt: true, users: {id: true, name: true, profileImage: true}}
+      },
     });
   }
 }
