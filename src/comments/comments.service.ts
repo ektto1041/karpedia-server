@@ -60,4 +60,8 @@ export class CommentsService {
 
     return await this.commentsRepository.save(foundComments);
   }
+
+  async delete(id: number): Promise<void> {
+    await this.commentsRepository.delete({ id });
+  }
 }

@@ -31,4 +31,9 @@ export class CommentsController {
   async update(@Body() newComments: NewCommentsUpdateDto): Promise<CommentsDto> {
     return (await this.commentsService.update(newComments)).toCommentsDto();
   }
+
+  @Delete(':id')
+  async delete(@Param('id') id: number): Promise<void> {
+    await this.commentsService.delete(id);
+  }
 }

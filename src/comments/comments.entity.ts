@@ -24,7 +24,7 @@ export class Comments {
   @ManyToOne(() => Users, (users) => users.id)
   users: Users;
 
-  @ManyToOne(() => Comments, comments => comments.id)
+  @ManyToOne(() => Comments, comments => comments.id, { onDelete: 'CASCADE' })
   replyTo: Comments;
 
   @OneToMany(() => Comments, comments => comments.replyTo)
