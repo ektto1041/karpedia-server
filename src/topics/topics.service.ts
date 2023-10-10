@@ -12,6 +12,8 @@ import { NewTopicsDto } from "./dto/new-topics.dto";
 import { UsersService } from "src/users/users.service";
 import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
 import { TopicsNameDto } from "./dto/topics-name.dto";
+import { TopicsWithOneChaptersDto, TopicsWithOneChaptersRaw } from "./dto/topics-with-one-chapters.dto";
+import { TopicsWithOneChaptersWithOnePostsDto, TopicsWithOneChaptersWithOnePostsRaw } from "./dto/topics-with-one-chapters-with-one-posts.dto";
 
 @Injectable()
 export class TopicsService {
@@ -106,6 +108,67 @@ export class TopicsService {
       select: {users: {id: true, name: true, profileImage: true}},
     });
   };
+
+  async findOneWithFirstChapters(id: number): Promise<TopicsWithOneChaptersDto> {
+    const foundTopics = await this.topicsRepository.createQueryBuilder('Topics')
+      .leftJoinAndSelect('Topics.chaptersList', 'Chapters')  
+      .select([
+        'Topics.*',
+        'Chapters.id AS chaptersId',
+        'Chapters.title AS chaptersTitle',
+        'Chapters.content AS chaptersContent',
+        'Chapters.orders AS chaptersOrders',
+      ])  
+      .where('Topics.id = :topicsId', { topicsId: id })
+      .orderBy('chaptersOrders', 'ASC')
+      .getRawOne<TopicsWithOneChaptersRaw>();
+    
+    return TopicsWithOneChaptersDto.fromRaw(foundTopics);
+  }
+
+  async findOneWithOneChaptersById(topicsId: number, chaptersId: number): Promise<TopicsWithOneChaptersDto> {
+    const foundTopics = await this.topicsRepository.createQueryBuilder('Topics')
+      .leftJoinAndSelect('Topics.chaptersList', 'Chapters')
+      .select([
+        'Topics.*',
+        'Chapters.id AS chaptersId',
+        'Chapters.title AS chaptersTitle',
+        'Chapters.content AS chaptersContent',
+        'Chapters.orders AS chaptersOrders',
+      ])
+      .where('Topics.id = :topicsId', { topicsId })
+      .andWhere('Chapters.id = :chaptersId', { chaptersId })
+      .getRawOne<TopicsWithOneChaptersRaw>();
+
+    return TopicsWithOneChaptersDto.fromRaw(foundTopics);
+  }
+
+  async findOneWithOneChaptersWithOnePosts(topicsId: number, chaptersId: number, postsId: number): Promise<TopicsWithOneChaptersWithOnePostsDto> {
+    const foundTopics = await this.topicsRepository.createQueryBuilder('Topics')
+      .leftJoin('Topics.chaptersList', 'Chapters')
+      .leftJoin('Chapters.postsList', 'Posts')
+      .select([
+        'Topics.*',
+        'Chapters.id AS chaptersId',
+        'Chapters.title AS chaptersTitle',
+        'Chapters.content AS chaptersContent',
+        'Chapters.orders AS chaptersOrders',
+        'Posts.id AS postsId',
+        'Posts.title AS postsTitle',
+        'Posts.content AS postsContent',
+        'Posts.orders AS postsOrders',
+        'Posts.status AS postsStatus',
+        'Posts.viewCount AS postsViewCount',
+        'Posts.createdAt AS postsCreatedAt',
+        'Posts.modifiedAt AS postsModifiedAt',
+      ])
+      .where('Topics.id = :topicsId', { topicsId })
+      .andWhere('Chapters.id = :chaptersId', { chaptersId })
+      .andWhere('Posts.id = :postsId', { postsId })
+      .getRawOne<TopicsWithOneChaptersWithOnePostsRaw>();
+    
+    return TopicsWithOneChaptersWithOnePostsDto.fromRaw(foundTopics);
+  }
 
   async update(topics: TopicsDto): Promise<TopicsDto> {
      const foundTopics = await this.topicsRepository.findOne({ where: { id: topics.id } });

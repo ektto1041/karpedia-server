@@ -29,13 +29,6 @@ export class ChaptersController {
     };
   };
 
-  @Get('topics/:topicsId')
-  async findFirstInTopics(@Param('topicsId') topicsId: number): Promise<ChaptersDto | null> {
-    const foundChapters = await this.chaptersService.findFirstInTopics(topicsId);
-
-    return foundChapters ? foundChapters.toChaptersDto() : null;
-  }
-
   @Post()
   async create(@Body() newChapters: NewChaptersDto): Promise<ChaptersDto> {
     return this.chaptersService.create(newChapters);
