@@ -16,6 +16,7 @@ import { Categories } from './categories/categories.entity';
 import { ChaptersModule } from './chapters/chapters.module';
 import { Chapters } from './chapters/chapters.entity';
 import { AdminMiddleware } from './middleware/admin.middleware';
+import { S3Module } from './s3/s3.module';
 
 const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
@@ -48,6 +49,7 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
     AuthsModule,
     CategoriesModule,
     ChaptersModule,
+    S3Module,
   ],
   controllers: [],
   providers: [],
@@ -74,6 +76,8 @@ export class AppModule implements NestModule {
           { path: 'comments', method: RequestMethod.POST },
           { path: 'comments', method: RequestMethod.PUT },
           { path: 'comments/:id', method: RequestMethod.DELETE },
+          { path: 's3/image', method: RequestMethod.POST },
+          
         )
         .apply(AdminMiddleware)
         .forRoutes(
