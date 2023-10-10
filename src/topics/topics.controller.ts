@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Req } from "@nestjs/common";
 import { TopicsService } from "./topics.service";
 import { TopicsDto } from "./dto/topics.dto";
 import { NewTopicsDto } from "./dto/new-topics.dto";
 import { Request } from "express";
+import { TopicsWithOneChaptersDto } from "./dto/topics-with-one-chapters.dto";
+import { TopicsWithOneChaptersWithOnePostsDto } from "./dto/topics-with-one-chapters-with-one-posts.dto";
 
 @Controller('topics')
 export class TopicsController {
@@ -38,6 +40,35 @@ export class TopicsController {
     const result = await this.topicsService.findOneWithChapters(id);
 
     return result;
+  }
+
+  @Get(':topicsId/chapters/first')
+  async findFirstInTopics(@Param('topicsId') topicsId: number): Promise<TopicsWithOneChaptersDto> {
+    try {
+      const foundTopics = await this.topicsService.findOneWithFirstChapters(topicsId);
+
+      return foundTopics;
+    } catch(error) {
+      throw new HttpException('Not Found Topic', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Get(':topicsId/chapters/:chaptersId')
+  async getOneTopicsByIdWithOneChaptersById(@Param('topicsId') topicsId: number, @Param('chaptersId') chaptersId: number): Promise<TopicsWithOneChaptersDto> {
+    try {
+      return await this.topicsService.findOneWithOneChaptersById(topicsId, chaptersId);
+    } catch(error) {
+      throw new HttpException('Not Found Topic|Chapter', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Get(':topicsId/chapters/:chaptersId/posts/:postsId')
+  async getOneTopicsByIdWithOneChaptersByIdWithOnePostsById(@Param('topicsId') topicsId: number, @Param('chaptersId') chaptersId: number, @Param('postsId') postsId: number): Promise<TopicsWithOneChaptersWithOnePostsDto> {
+    try {
+      return await this.topicsService.findOneWithOneChaptersWithOnePosts(topicsId, chaptersId, postsId);
+    } catch(error) {
+      throw new HttpException('Not Found Topic|Chapter|Post', HttpStatus.NOT_FOUND);
+    }
   }
 
   @Post()

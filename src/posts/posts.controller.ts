@@ -21,6 +21,11 @@ export class PostsController {
     return posts.toPostsDto();
   };
 
+  @Get(':id')
+  async findOneById(@Param('id') id: number): Promise<PostsDto> {
+    return (await this.postsService.findOneById(id)).toPostsDto();
+  }
+
   @Get('update/:id')
   async getUpdatePosts(@Param('id') id: number): Promise<UpdatePostsDto> {
     const foundPosts = await this.postsService.findOneWithChaptersWithTopicsById(id);

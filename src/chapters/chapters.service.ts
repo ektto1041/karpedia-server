@@ -60,6 +60,12 @@ export class ChaptersService {
     });
   };
 
+  async findFirstInTopics(topicsId: number): Promise<Chapters | null> {
+    return await this.chaptersRepository.findOne({
+      where: { topics: { id: topicsId } }
+    });
+  }
+
   async update(newChapters: NewChaptersUpdateDto): Promise<Chapters> {
     const {id} = newChapters;
 

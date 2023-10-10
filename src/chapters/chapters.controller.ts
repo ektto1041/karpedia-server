@@ -4,7 +4,6 @@ import { NewChaptersDto } from './dto/new-chapters.dto';
 import { ChaptersDto } from './dto/chapters.dto';
 import { TopicsService } from 'src/topics/topics.service';
 import { UpdateChaptersDto } from './dto/update-chapters.dto';
-import { ChaptersWithTopicsIdDto } from './dto/chapters-with-topics-id.dto';
 import { NewChaptersUpdateDto } from './dto/new-chapters-update.dto';
 
 @Controller('chapters')
@@ -13,6 +12,11 @@ export class ChaptersController {
     private readonly chaptersService: ChaptersService,
     private readonly topicsService: TopicsService,
   ) {}
+
+  @Get(':id')
+  async findOneById(@Param('id') id: number): Promise<ChaptersDto> {
+    return (await this.chaptersService.findOneById(id)).toChaptersDto();
+  }
 
   @Get('update/:id')
   async getUpdateChapters(@Param('id') id: number): Promise<UpdateChaptersDto> {
