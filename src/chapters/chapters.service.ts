@@ -56,7 +56,7 @@ export class ChaptersService {
     return await this.chaptersRepository.find({
       select: ['id', 'title', 'orders'],
       where: { topics: { id: topics.id } },
-      order: { orders: 'DESC' },
+      order: { orders: 'ASC' },
     });
   };
 
