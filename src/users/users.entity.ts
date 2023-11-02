@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToMany, JoinTable } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { PublicUsersDto } from "./dto/public-users.dto";
+import { Topics } from "src/topics/topics.entity";
 
 @Entity()
 export class Users {
@@ -27,6 +28,10 @@ export class Users {
 
   @UpdateDateColumn()
   modifiedAt: Date;
+
+  @ManyToMany(() => Topics, topics => topics.subscribedUsers)
+  @JoinTable()
+  subscribedTopics: Topics[];
 
   // methods
   static create(createUserDto: CreateUserDto): Users {

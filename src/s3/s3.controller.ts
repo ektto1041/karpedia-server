@@ -19,7 +19,6 @@ export class S3Controller {
     try {
       return await this.s3Service.uploadImage(file, newName);
     } catch(error) {
-      console.log(error);
       throw new HttpException('Image Upload Fail', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   };

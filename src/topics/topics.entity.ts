@@ -1,7 +1,7 @@
 import { Categories } from "src/categories/categories.entity";
 import { Chapters } from "src/chapters/chapters.entity";
 import { Users } from "src/users/users.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, ManyToMany } from "typeorm";
 import { TopicsDto } from "./dto/topics.dto";
 import { NewTopicsDto } from "./dto/new-topics.dto";
 
@@ -27,6 +27,9 @@ export class Topics {
 
   @OneToMany(() => Chapters, chapters => chapters.topics)
   chaptersList: Chapters[];
+
+  @ManyToMany(() => Users, users => users.subscribedTopics)
+  subscribedUsers: Users[];
 
   /**
    * Methods

@@ -14,6 +14,7 @@ import { TopicsWithChaptersDto } from "./dto/topics-with-chapters.dto";
 import { TopicsNameDto } from "./dto/topics-name.dto";
 import { TopicsWithOneChaptersDto, TopicsWithOneChaptersRaw } from "./dto/topics-with-one-chapters.dto";
 import { TopicsWithOneChaptersWithOnePostsDto, TopicsWithOneChaptersWithOnePostsRaw } from "./dto/topics-with-one-chapters-with-one-posts.dto";
+import { Users } from "src/users/users.entity";
 
 @Injectable()
 export class TopicsService {
@@ -191,6 +192,28 @@ export class TopicsService {
     await this.topicsRepository.save(a);
     await this.topicsRepository.save(b);
   };
+
+  async subscribe(usersId: number, topicsId: number): Promise<boolean> {
+    const foundUsers = await this.usersService.findByUserId(usersId);
+    const foundTopics = await this.topicsRepository.findOne({
+      relations: { subscribedUsers: true },
+      where: { id: topicsId },
+    });
+
+    const subscribedUsersIdx = foundTopics.subscribedUsers.findIndex(users => users.id === usersId);
+    
+    let subscribeResult = false;
+    if(subscribedUsersIdx !== -1) {
+      foundTopics.subscribedUsers.splice(subscribedUsersIdx, 1);
+    } else {
+      foundTopics.subscribedUsers.push(foundUsers);
+      subscribeResult = true;
+    }
+
+    this.topicsRepository.save(foundTopics);
+
+    return subscribeResult;
+  }
 
   delete(topicsId: number) {
     this.topicsRepository.delete({ id: topicsId });
