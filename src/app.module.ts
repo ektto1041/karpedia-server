@@ -17,6 +17,9 @@ import { ChaptersModule } from './chapters/chapters.module';
 import { Chapters } from './chapters/chapters.entity';
 import { AdminMiddleware } from './middleware/admin.middleware';
 import { S3Module } from './s3/s3.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { MailModule } from './mail/mail.module';
 
 const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
@@ -33,6 +36,37 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
     // In Production, shoule be false
     synchronize: configService.get('NODE_ENV') === 'prod' ? false : false,
   })
+});
+
+const mailerModule: DynamicModule = MailerModule.forRootAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => {
+    console.log(configService.get('GMAIL_USERNAME'));
+    console.log(configService.get('GMAIL_PASSWORD'));
+    console.log(configService.get('GMAIL_FROM'));
+    return {
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: configService.get('GMAIL_USERNAME'),
+          pass: configService.get('GMAIL_PASSWORD'),
+        },
+      },
+      defaults: {
+        from: configService.get('GMAIL_FROM'),
+      },
+      template: {
+        dir: __dirname + '/templates',
+        adapter: new EjsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }
+  },
 })
 
 @Module({
@@ -50,6 +84,8 @@ const typeOrmModule: DynamicModule = TypeOrmModule.forRootAsync({
     CategoriesModule,
     ChaptersModule,
     S3Module,
+    mailerModule,
+    MailModule,
   ],
   controllers: [],
   providers: [],
