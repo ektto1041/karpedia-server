@@ -41,7 +41,7 @@ export class CommentsService {
 
     const savedComments = await this.commentsRepository.save(comments);
 
-    this.mailService.sendAdmin('새 댓글 작성 알림', 'new-comment.ejs');
+    this.mailService.newCommentsAlarm(foundPosts.title);
 
     return savedComments
   }
