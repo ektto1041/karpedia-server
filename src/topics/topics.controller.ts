@@ -5,6 +5,8 @@ import { NewTopicsDto } from "./dto/new-topics.dto";
 import { Request } from "express";
 import { TopicsWithOneChaptersDto } from "./dto/topics-with-one-chapters.dto";
 import { TopicsWithOneChaptersWithOnePostsDto } from "./dto/topics-with-one-chapters-with-one-posts.dto";
+import { Topics } from "./topics.entity";
+import { SubscribeTopicsResultDto } from "./dto/subscribe-topics-result.dto";
 
 @Controller('topics')
 export class TopicsController {
@@ -24,7 +26,7 @@ export class TopicsController {
   }
 
   @Get(['categories', 'setting'])
-  findAllWithCategories() {
+  async findAllWithCategories() {
     return this.topicsService.findAllWithCategories();
   }
 
@@ -83,10 +85,20 @@ export class TopicsController {
     return this.topicsService.update(topics);
   }
 
+  @Patch('subscribe/:topicsId')
+  async subscribeTopics(@Param('topicsId') topicsId: number, @Req() req: Request): Promise<SubscribeTopicsResultDto> {
+    const usersId: number = parseInt(req.cookies.uid);
+
+    const subscribeResult = await this.topicsService.subscribe(usersId, topicsId);
+
+    return new SubscribeTopicsResultDto(subscribeResult);
+  }
+
   @Patch(':from/:to')
   async swapOrders(@Param('from') from: number, @Param('to') to: number): Promise<void> {
     this.topicsService.swapOrders(from, to);
   }
+
 
   @Delete(':id')
   delete(@Param('id') id: number) {

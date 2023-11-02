@@ -42,9 +42,6 @@ const mailerModule: DynamicModule = MailerModule.forRootAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
   useFactory: (configService: ConfigService) => {
-    console.log(configService.get('GMAIL_USERNAME'));
-    console.log(configService.get('GMAIL_PASSWORD'));
-    console.log(configService.get('GMAIL_FROM'));
     return {
       transport: {
         host: 'smtp.gmail.com',
@@ -97,6 +94,7 @@ export class AppModule implements NestModule {
         .forRoutes(
           '/auths/check',
           { path: 'users/self', method: RequestMethod.GET },
+          { path: 'users/subscribed/topics', method: RequestMethod.GET },
           '/topics/setting',
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },
@@ -104,6 +102,7 @@ export class AppModule implements NestModule {
           { path: 'topics', method: RequestMethod.POST },
           { path: 'topics', method: RequestMethod.PUT },
           { path: 'topics/:id', method: RequestMethod.DELETE },
+          { path: 'topics/subscribe/:topicsId', method: RequestMethod.PATCH },
           { path: 'chapters', method: RequestMethod.PUT },
           '/chapters/update/:id',
           { path: 'posts', method: RequestMethod.PUT },

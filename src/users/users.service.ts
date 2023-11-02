@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { And, ArrayContains, DataSource, DeleteResult, In, Like, QueryBuilder, Repository, SelectQueryBuilder, Transaction, UpdateResult } from 'typeorm';
 import { Users } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { IdDto } from 'src/dto/id.dto';
 
 @Injectable()
 export class UsersService {
@@ -31,5 +32,15 @@ export class UsersService {
 
   async findByUserId(userId: number): Promise<Users> {
     return await this.usersRepository.findOneBy({ id: userId });
+  }
+
+  async getSubscribedTopics(usersId: number): Promise<IdDto[]> {
+    const foundUsers = await this.usersRepository.findOne({
+      relations: { subscribedTopics: true },
+      select: { subscribedTopics: { id: true} },
+      where: { id: usersId },
+    });
+
+    return foundUsers.subscribedTopics;
   }
 }
