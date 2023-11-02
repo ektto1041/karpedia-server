@@ -194,23 +194,26 @@ export class TopicsService {
   };
 
   async subscribe(usersId: number, topicsId: number): Promise<boolean> {
-    const foundUsers = await this.usersService.findByUserId(usersId);
-    const foundTopics = await this.topicsRepository.findOne({
-      relations: { subscribedUsers: true },
-      where: { id: topicsId },
-    });
-
-    const subscribedUsersIdx = foundTopics.subscribedUsers.findIndex(users => users.id === usersId);
+    const found = await this.topicsRepository.createQueryBuilder('Topics')
+      .leftJoin('Topics.subscribedUsers', 'SubsUsers')
+      .select('SubsUsers.id AS usersId')
+      .where('Topics.id = :topicsId', { topicsId })
+      .getRawOne();
     
     let subscribeResult = false;
-    if(subscribedUsersIdx !== -1) {
-      foundTopics.subscribedUsers.splice(subscribedUsersIdx, 1);
+    if(found.usersId) {
+      await this.topicsRepository.createQueryBuilder('Topics')
+        .relation(Users, 'subscribedTopics')
+        .of(usersId)
+        .remove(topicsId);
     } else {
-      foundTopics.subscribedUsers.push(foundUsers);
+      await this.topicsRepository.createQueryBuilder('Topics')
+        .relation(Users, 'subscribedTopics')
+        .of(usersId)
+        .add(topicsId);
+      
       subscribeResult = true;
     }
-
-    this.topicsRepository.save(foundTopics);
 
     return subscribeResult;
   }
