@@ -94,6 +94,7 @@ export class AppModule implements NestModule {
         .forRoutes(
           '/auths/check',
           { path: 'users/self', method: RequestMethod.GET },
+          { path: 'users/subscribed/topics', method: RequestMethod.GET },
           '/topics/setting',
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },
