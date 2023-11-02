@@ -7,6 +7,7 @@ import { NewCommentsDto } from "./dto/new-comments.dto";
 import { UsersService } from "src/users/users.service";
 import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
 import { NewCommentsUpdateDto } from "./dto/new-comments-update.dto";
+import { MailService } from "src/mail/mail.service";
 
 @Injectable()
 export class CommentsService {
@@ -15,6 +16,7 @@ export class CommentsService {
     private readonly commentsRepository: Repository<Comments>,
     private readonly usersService: UsersService,
     private readonly postsService: PostsService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(newComments: NewCommentsDto, usersId: number): Promise<Comments> {
@@ -35,9 +37,13 @@ export class CommentsService {
       });
 
       comments.replyTo = foundComments;
-    } 
+    }
 
-    return await this.commentsRepository.save(comments);
+    const savedComments = await this.commentsRepository.save(comments);
+
+    this.mailService.sendAdmin('새 댓글 작성 알림', 'new-comment.ejs');
+
+    return savedComments
   }
 
   async findAllWithPublicUsersWithReplyToByPostsId(postsId: number): Promise<CommentsWithPublicUsersWithReplyToDto[]> {
