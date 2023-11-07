@@ -1,12 +1,13 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, HttpStatusCode } from 'axios';
 import { Observable } from 'rxjs';
 import { And, ArrayContains, DataSource, DeleteResult, In, Like, QueryBuilder, Repository, SelectQueryBuilder, Transaction, UpdateResult } from 'typeorm';
 import { Users } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IdDto } from 'src/dto/id.dto';
+import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,6 +25,16 @@ export class UsersService {
 
   async update(newUsers: Users) {
     return await this.usersRepository.save(newUsers);
+  }
+
+  async updateProfileImage(usersId: number, newProfileImage: UpdateProfileImageDto): Promise<void> {
+    const result = await this.usersRepository.createQueryBuilder('Users')
+      .update(Users)
+      .set({ profileImage: newProfileImage.profileImage })
+      .where({ id: usersId })
+      .execute();
+    
+    if(result.affected !== 1) throw new HttpException('Fail to update profile image', HttpStatus.BAD_REQUEST);
   }
 
   async findByServiceId(serviceId: string) {

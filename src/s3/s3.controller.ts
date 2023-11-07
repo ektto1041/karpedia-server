@@ -14,7 +14,7 @@ export class S3Controller {
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
     const fileName = file.originalname.split('.');
-    const newName = `${Date.now().toString()}_${req.cookies.uid}. ${fileName[fileName.length-1]}`;
+    const newName = `${Date.now().toString()}_${req.cookies.uid}.${fileName[fileName.length-1]}`;
 
     try {
       return await this.s3Service.uploadImage(file, newName);
