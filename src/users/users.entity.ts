@@ -11,8 +11,11 @@ export class Users {
   @Column()
   serviceId: string;
 
-  @Column()
+  @Column({ length: 320 })
   name: string;
+
+  @Column({ length: 320 })
+  email: string;
 
   @Column()
   profileImage: string;
