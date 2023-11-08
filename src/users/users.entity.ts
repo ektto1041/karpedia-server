@@ -52,6 +52,7 @@ export class Users {
     const publicUsers = new PublicUsersDto();
     publicUsers.id = this.id;
     publicUsers.name = this.name;
+    publicUsers.email = this.email;
     publicUsers.profileImage = this.profileImage;
 
     return publicUsers;
