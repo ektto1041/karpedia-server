@@ -41,6 +41,7 @@ export class Users {
     const newUsers = new Users();
     newUsers.serviceId = createUserDto.serviceId;
     newUsers.name = createUserDto.name;
+    newUsers.email = createUserDto.name;
     newUsers.profileImage = createUserDto.profileImage;
     newUsers.refreshToken = createUserDto.refreshToken;
     newUsers.authority = 0;
