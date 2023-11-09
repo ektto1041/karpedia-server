@@ -79,6 +79,20 @@ export class AuthsController {
     res.redirect(301, this.configService.get('CLIENT_URI'));
   }
 
+  @Get('/logout')
+  async logout(@Res() res: Response, @Req() req: Request) {
+    const at: string = req.cookies.at;
+
+    const result = await this.oauth2Client.revokeToken(at);
+
+    res.clearCookie('at');
+    res.clearCookie('rt');
+    res.clearCookie('uid');
+    res.clearCookie('is_admin');
+
+    res.status(200).send();
+  }
+
   // 임시
   @Get('/testat')
   async testat(@Req() req: Request) {
