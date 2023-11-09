@@ -4,6 +4,7 @@ import { Request } from "express";
 import { PublicUsersDto } from "./dto/public-users.dto";
 import { IdDto } from "src/dto/id.dto";
 import { UpdateProfileImageDto } from "./dto/update-profile-image.dto";
+import { UpdateNameDto } from "./dto/update-name.dto";
 
 @Controller('users')
 export class UsersController {
@@ -38,5 +39,18 @@ export class UsersController {
     }
 
     return newProfileImage;
+  }
+
+  @Patch('name')
+  async updateName(@Req() req: Request, @Body() newName: UpdateNameDto): Promise<UpdateNameDto> {
+    const usersId: number = req.cookies.uid;
+
+    try {
+      await this.usersService.updateName(usersId, newName);
+    } catch(error) {
+      throw error;
+    }
+
+    return newName;
   }
 }

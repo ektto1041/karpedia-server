@@ -96,6 +96,7 @@ export class AppModule implements NestModule {
           { path: 'users/self', method: RequestMethod.GET },
           { path: 'users/subscribed/topics', method: RequestMethod.GET },
           { path: 'users/image', method: RequestMethod.PATCH },
+          { path: 'users/name', method: RequestMethod.PATCH },
           '/topics/setting',
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },

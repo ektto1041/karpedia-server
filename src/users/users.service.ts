@@ -8,6 +8,7 @@ import { Users } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IdDto } from 'src/dto/id.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { UpdateNameDto } from './dto/update-name.dto';
 
 @Injectable()
 export class UsersService {
@@ -35,6 +36,16 @@ export class UsersService {
       .execute();
     
     if(result.affected !== 1) throw new HttpException('Fail to update profile image', HttpStatus.BAD_REQUEST);
+  }
+
+  async updateName(usersId: number, newName: UpdateNameDto): Promise<void> {
+    const result = await this.usersRepository.createQueryBuilder('Users')
+      .update(Users)
+      .set({ name: newName.name })
+      .where({ id: usersId })
+      .execute();
+    
+    if(result.affected !== 1) throw new HttpException('Fail to update username', HttpStatus.BAD_REQUEST);
   }
 
   async findByServiceId(serviceId: string) {
