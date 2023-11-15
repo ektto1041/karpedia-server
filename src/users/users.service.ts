@@ -39,13 +39,20 @@ export class UsersService {
   }
 
   async updateName(usersId: number, newName: UpdateNameDto): Promise<void> {
+    const hasName = await this.usersRepository.createQueryBuilder('Users')
+      .select(['Users.id'])
+      .where({ name: newName.name })
+      .getCount();
+    
+    if(hasName === 1) throw new HttpException({code: 101, message: '중복된 이름이 존재합니다.'}, HttpStatus.BAD_REQUEST);
+
     const result = await this.usersRepository.createQueryBuilder('Users')
       .update(Users)
       .set({ name: newName.name })
       .where({ id: usersId })
       .execute();
     
-    if(result.affected !== 1) throw new HttpException('Fail to update username', HttpStatus.BAD_REQUEST);
+    if(result.affected !== 1) throw new HttpException({code: 100, message: 'Fail to update username'}, HttpStatus.BAD_REQUEST);
   }
 
   async findByServiceId(serviceId: string) {
