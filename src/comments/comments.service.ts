@@ -8,6 +8,7 @@ import { UsersService } from "src/users/users.service";
 import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
 import { NewCommentsUpdateDto } from "./dto/new-comments-update.dto";
 import { MailService } from "src/mail/mail.service";
+import { CommentsByUsersDto } from "./dto/comments-by-users.dto";
 
 @Injectable()
 export class CommentsService {
@@ -55,6 +56,20 @@ export class CommentsService {
         replyTo: {id: true, content: true, createdAt: true, modifiedAt: true, users: {id: true, name: true, profileImage: true}}
       },
     });
+  }
+
+  async findAllByUsersId(usersId: number): Promise<CommentsByUsersDto[]> {
+    const result = await this.commentsRepository.createQueryBuilder('Comments')
+      .leftJoin('Comments.posts', 'Posts')
+      .leftJoin('Comments.replyTo', 'ReplyTo')
+      .select('Comments.id', 'id')
+      .addSelect('Comments.content', 'content')
+      .addSelect('Comments.modifiedAt', 'modifiedAt')
+      .addSelect('Posts.title', 'postTitle')
+      .addSelect('ReplyTo.id', 'replyTo')
+      .getRawMany<CommentsByUsersDto>();
+
+    return result;
   }
 
   async update(newComments: NewCommentsUpdateDto): Promise<Comments> {
