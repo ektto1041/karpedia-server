@@ -26,6 +26,9 @@ export class Users {
   @Column()
   authority: number;
 
+  @Column('tinyint')
+  isSubscribedTopicsAlarmAllowed: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
