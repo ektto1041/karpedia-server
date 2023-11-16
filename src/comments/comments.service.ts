@@ -61,12 +61,17 @@ export class CommentsService {
   async findAllByUsersId(usersId: number): Promise<CommentsByUsersDto[]> {
     const result = await this.commentsRepository.createQueryBuilder('Comments')
       .leftJoin('Comments.posts', 'Posts')
+      .leftJoin('Posts.chapters', 'Chapters')
       .leftJoin('Comments.replyTo', 'ReplyTo')
       .select('Comments.id', 'id')
       .addSelect('Comments.content', 'content')
       .addSelect('Comments.modifiedAt', 'modifiedAt')
+      .addSelect('Posts.id', 'postId')
       .addSelect('Posts.title', 'postTitle')
+      .addSelect('Chapters.id', 'chapterId')
+      .addSelect('Chapters.topics.id', 'topicId')
       .addSelect('ReplyTo.id', 'replyTo')
+      .where({ users: {id: usersId} })
       .getRawMany<CommentsByUsersDto>();
 
     return result;
