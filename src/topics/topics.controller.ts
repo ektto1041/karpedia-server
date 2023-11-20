@@ -20,6 +20,13 @@ export class TopicsController {
     return foundTopics.map(t => t.toTopicsDto());
   }
 
+  @Get('subscribed')
+  async findAllSubscribed(@Req() req: Request): Promise<TopicsDto[]> {
+    const usersId: number = req.cookies.uid;
+
+    return await this.topicsService.findAllSubscribed(usersId);
+  }
+
   @Get('posts')
   async findAllWithChaptersWithPosts() {
     return this.topicsService.findAllWithChaptersWithPosts();

@@ -171,6 +171,17 @@ export class TopicsService {
     return TopicsWithOneChaptersWithOnePostsDto.fromRaw(foundTopics);
   }
 
+  async findAllSubscribed(usersId: number): Promise<TopicsDto[]> {
+    return await this.topicsRepository.createQueryBuilder('Topics')
+      .leftJoin('Topics.subscribedUsers', 'SubsUsers')
+      .select('Topics.id', 'id')
+      .addSelect('Topics.name', 'name')
+      .addSelect('Topics.description', 'description')
+      .addSelect('Topics.orders', 'orders')
+      .where('SubsUsers.id = :usersId', { usersId })
+      .getRawMany<TopicsDto>();
+  }
+
   async update(topics: TopicsDto): Promise<TopicsDto> {
      const foundTopics = await this.topicsRepository.findOne({ where: { id: topics.id } });
      foundTopics.update(topics);

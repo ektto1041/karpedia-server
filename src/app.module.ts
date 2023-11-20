@@ -104,6 +104,7 @@ export class AppModule implements NestModule {
           { path: 'categories/:id', method: RequestMethod.DELETE },
           { path: 'topics', method: RequestMethod.POST },
           { path: 'topics', method: RequestMethod.PUT },
+          { path: 'topics/subscribed', method: RequestMethod.GET },
           { path: 'topics/:id', method: RequestMethod.DELETE },
           { path: 'topics/subscribe/:topicsId', method: RequestMethod.PATCH },
           { path: 'chapters', method: RequestMethod.PUT },
