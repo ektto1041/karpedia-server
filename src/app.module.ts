@@ -98,6 +98,7 @@ export class AppModule implements NestModule {
           { path: 'users/subscribed/topics', method: RequestMethod.GET },
           { path: 'users/image', method: RequestMethod.PATCH },
           { path: 'users/name', method: RequestMethod.PATCH },
+          { path: 'users/is-subscribed-topics-alarm-allowed', method: RequestMethod.PATCH },
           '/topics/setting',
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },

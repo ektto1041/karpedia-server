@@ -5,6 +5,7 @@ import { PublicUsersDto } from "./dto/public-users.dto";
 import { IdDto } from "src/dto/id.dto";
 import { UpdateProfileImageDto } from "./dto/update-profile-image.dto";
 import { UpdateNameDto } from "./dto/update-name.dto";
+import { UpdateIsSubscribedTopicsAlarmAllowedDto } from "./dto/update-is-subscribed-topics-alarm-allowed.dto";
 
 @Controller('users')
 export class UsersController {
@@ -52,5 +53,18 @@ export class UsersController {
     }
 
     return newName;
+  }
+
+  @Patch('is-subscribed-topics-alarm-allowed')
+  async updateIsSubscribedTopicsAlarmAllowed(@Req() req: Request, @Body() newIsSubscribedTopicsAlarmAllowed: UpdateIsSubscribedTopicsAlarmAllowedDto): Promise<UpdateIsSubscribedTopicsAlarmAllowedDto> {
+    const usersId: number = req.cookies.uid;
+
+    try {
+      await this.usersService.updateIsSubscribedTopicsAlarmAllowed(usersId, newIsSubscribedTopicsAlarmAllowed);
+    } catch(error) {
+      throw error;
+    }
+
+    return newIsSubscribedTopicsAlarmAllowed;
   }
 }

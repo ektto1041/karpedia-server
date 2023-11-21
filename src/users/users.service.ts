@@ -9,6 +9,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { IdDto } from 'src/dto/id.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateNameDto } from './dto/update-name.dto';
+import { UpdateIsSubscribedTopicsAlarmAllowedDto } from './dto/update-is-subscribed-topics-alarm-allowed.dto';
 
 @Injectable()
 export class UsersService {
@@ -53,6 +54,16 @@ export class UsersService {
       .execute();
     
     if(result.affected !== 1) throw new HttpException({code: 100, message: 'Fail to update username'}, HttpStatus.BAD_REQUEST);
+  }
+
+  async updateIsSubscribedTopicsAlarmAllowed(usersId: number, newIsSubscribedTopicsAlarmAllowed: UpdateIsSubscribedTopicsAlarmAllowedDto): Promise<void> {
+    const result = await this.usersRepository.createQueryBuilder('Users')
+      .update(Users)
+      .set({ isSubscribedTopicsAlarmAllowed: newIsSubscribedTopicsAlarmAllowed.isSubscribedTopicsAlarmAllowed })
+      .where({ id: usersId })
+      .execute();
+    
+    if(result.affected !== 1) throw new HttpException({code: 100, message: 'Fail to update isSubscribedTopicsAlarmAllowed'}, HttpStatus.BAD_REQUEST);
   }
 
   async findByServiceId(serviceId: string) {
