@@ -5,8 +5,8 @@ import { NewTopicsDto } from "./dto/new-topics.dto";
 import { Request } from "express";
 import { TopicsWithOneChaptersDto } from "./dto/topics-with-one-chapters.dto";
 import { TopicsWithOneChaptersWithOnePostsDto } from "./dto/topics-with-one-chapters-with-one-posts.dto";
-import { Topics } from "./topics.entity";
 import { SubscribeTopicsResultDto } from "./dto/subscribe-topics-result.dto";
+import { TopicsWithCategoriesNameDto } from "./dto/topics-with-categories-name.dto";
 
 @Controller('topics')
 export class TopicsController {
@@ -21,7 +21,7 @@ export class TopicsController {
   }
 
   @Get('subscribed')
-  async findAllSubscribed(@Req() req: Request): Promise<TopicsDto[]> {
+  async findAllSubscribed(@Req() req: Request): Promise<TopicsWithCategoriesNameDto[]> {
     const usersId: number = req.cookies.uid;
 
     return await this.topicsService.findAllSubscribed(usersId);

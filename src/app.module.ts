@@ -115,8 +115,7 @@ export class AppModule implements NestModule {
           { path: 'comments', method: RequestMethod.POST },
           { path: 'comments', method: RequestMethod.PUT },
           { path: 'comments/:id', method: RequestMethod.DELETE },
-          { path: 's3/image', method: RequestMethod.POST },
-          
+          { path: 's3/image', method: RequestMethod.POST }, 
         )
         .apply(AdminMiddleware)
         .forRoutes(
