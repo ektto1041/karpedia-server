@@ -16,6 +16,7 @@ import { TopicsWithOneChaptersDto, TopicsWithOneChaptersRaw } from "./dto/topics
 import { TopicsWithOneChaptersWithOnePostsDto, TopicsWithOneChaptersWithOnePostsRaw } from "./dto/topics-with-one-chapters-with-one-posts.dto";
 import { Users } from "src/users/users.entity";
 import { TopicsWithCategoriesNameDto } from "./dto/topics-with-categories-name.dto";
+import { Subscriber } from "src/users/dto/subscriber.dto";
 
 @Injectable()
 export class TopicsService {
@@ -212,10 +213,11 @@ export class TopicsService {
       .leftJoin('Topics.subscribedUsers', 'SubsUsers')
       .select('SubsUsers.id AS usersId')
       .where('Topics.id = :topicsId', { topicsId })
+      .andWhere('SubsUsers.id = :usersId', { usersId })
       .getRawOne();
     
     let subscribeResult = false;
-    if(found.usersId) {
+    if(found?.usersId) {
       await this.topicsRepository.createQueryBuilder('Topics')
         .relation(Users, 'subscribedTopics')
         .of(usersId)
@@ -230,6 +232,17 @@ export class TopicsService {
     }
 
     return subscribeResult;
+  }
+
+  async getSubscribers(topicsId: number): Promise<Subscriber[]> {
+    const result = await this.topicsRepository.createQueryBuilder('Topics')
+      .leftJoin('Topics.subscribedUsers', 'Users')
+      .select('Users.email', 'email')
+      .addSelect('Users.isSubscribedTopicsAlarmAllowed', 'isSubscribedTopicsAlarmAllowed')
+      .where({ id: topicsId })
+      .getRawMany<Subscriber>();
+    
+    return result.filter(s => s.isSubscribedTopicsAlarmAllowed === 1);
   }
 
   delete(topicsId: number) {
