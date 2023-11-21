@@ -72,4 +72,13 @@ export class UsersService {
 
     return foundUsers.subscribedTopics;
   }
+
+  async getIsSubscribedTopicsAlarmAllowed(usersId: number): Promise<boolean> {
+    const result = await this.usersRepository.createQueryBuilder('Users')
+      .select('Users.isSubscribedTopicsAlarmAllowed', 'isSubscribedTopicsAlarmAllowed')
+      .where({ id: usersId })
+      .getRawOne();
+    
+      return result.isSubscribedTopicsAlarmAllowed;
+  }
 }

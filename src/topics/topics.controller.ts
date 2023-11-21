@@ -7,11 +7,14 @@ import { TopicsWithOneChaptersDto } from "./dto/topics-with-one-chapters.dto";
 import { TopicsWithOneChaptersWithOnePostsDto } from "./dto/topics-with-one-chapters-with-one-posts.dto";
 import { SubscribeTopicsResultDto } from "./dto/subscribe-topics-result.dto";
 import { TopicsWithCategoriesNameDto } from "./dto/topics-with-categories-name.dto";
+import { UsersService } from "src/users/users.service";
+import { SubscribedTopicsResultDto } from "./dto/subscribed-topics-result.dto";
 
 @Controller('topics')
 export class TopicsController {
   constructor(
     private readonly topicsService: TopicsService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Get()
@@ -21,10 +24,13 @@ export class TopicsController {
   }
 
   @Get('subscribed')
-  async findAllSubscribed(@Req() req: Request): Promise<TopicsWithCategoriesNameDto[]> {
+  async findAllSubscribed(@Req() req: Request): Promise<SubscribedTopicsResultDto> {
     const usersId: number = req.cookies.uid;
 
-    return await this.topicsService.findAllSubscribed(usersId);
+    const isSubscribedTopicsAlarmAllowed = await this.usersService.getIsSubscribedTopicsAlarmAllowed(usersId);
+    const topics = await this.topicsService.findAllSubscribed(usersId);
+
+    return { isSubscribedTopicsAlarmAllowed, topics }
   }
 
   @Get('posts')
