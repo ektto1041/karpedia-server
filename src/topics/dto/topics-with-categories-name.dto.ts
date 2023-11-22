@@ -1,7 +1,7 @@
-export class TopicsWithCategoriesDto {
+export class TopicsWithCategoriesNameDto {
   id: number;
   name: string;
   description: string;
   orders: number;
-  categoriesId: number;
+  categoriesName: string;
 }

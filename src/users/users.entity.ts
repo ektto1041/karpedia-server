@@ -11,8 +11,11 @@ export class Users {
   @Column()
   serviceId: string;
 
-  @Column()
+  @Column({ length: 320 })
   name: string;
+
+  @Column({ length: 320 })
+  email: string;
 
   @Column()
   profileImage: string;
@@ -22,6 +25,9 @@ export class Users {
 
   @Column()
   authority: number;
+
+  @Column('tinyint')
+  isSubscribedTopicsAlarmAllowed: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -38,6 +44,7 @@ export class Users {
     const newUsers = new Users();
     newUsers.serviceId = createUserDto.serviceId;
     newUsers.name = createUserDto.name;
+    newUsers.email = createUserDto.name;
     newUsers.profileImage = createUserDto.profileImage;
     newUsers.refreshToken = createUserDto.refreshToken;
     newUsers.authority = 0;
@@ -48,6 +55,7 @@ export class Users {
     const publicUsers = new PublicUsersDto();
     publicUsers.id = this.id;
     publicUsers.name = this.name;
+    publicUsers.email = this.email;
     publicUsers.profileImage = this.profileImage;
 
     return publicUsers;

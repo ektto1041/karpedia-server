@@ -36,7 +36,7 @@ export class ChaptersService {
   };
 
   async findOneById(chapterId: number): Promise<Chapters> {
-    return this.chaptersRepository.findOne({ where: { id: chapterId } });
+    return this.chaptersRepository.findOne({ relations: { topics: true }, where: { id: chapterId } });
   };
 
   async findOneByIdWithTopicsId(chapterId: number): Promise<ChaptersWithTopicsIdDto> {

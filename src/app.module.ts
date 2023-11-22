@@ -93,14 +93,19 @@ export class AppModule implements NestModule {
         .apply(AuthMiddleware)
         .forRoutes(
           '/auths/check',
+          { path: 'auths/logout', method: RequestMethod.GET },
           { path: 'users/self', method: RequestMethod.GET },
           { path: 'users/subscribed/topics', method: RequestMethod.GET },
+          { path: 'users/image', method: RequestMethod.PATCH },
+          { path: 'users/name', method: RequestMethod.PATCH },
+          { path: 'users/is-subscribed-topics-alarm-allowed', method: RequestMethod.PATCH },
           '/topics/setting',
           { path: 'categories', method: RequestMethod.POST },
           { path: 'categories', method: RequestMethod.PUT },
           { path: 'categories/:id', method: RequestMethod.DELETE },
           { path: 'topics', method: RequestMethod.POST },
           { path: 'topics', method: RequestMethod.PUT },
+          { path: 'topics/subscribed', method: RequestMethod.GET },
           { path: 'topics/:id', method: RequestMethod.DELETE },
           { path: 'topics/subscribe/:topicsId', method: RequestMethod.PATCH },
           { path: 'chapters', method: RequestMethod.PUT },
@@ -111,8 +116,7 @@ export class AppModule implements NestModule {
           { path: 'comments', method: RequestMethod.POST },
           { path: 'comments', method: RequestMethod.PUT },
           { path: 'comments/:id', method: RequestMethod.DELETE },
-          { path: 's3/image', method: RequestMethod.POST },
-          
+          { path: 's3/image', method: RequestMethod.POST }, 
         )
         .apply(AdminMiddleware)
         .forRoutes(

@@ -1,12 +1,15 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, HttpStatusCode } from 'axios';
 import { Observable } from 'rxjs';
 import { And, ArrayContains, DataSource, DeleteResult, In, Like, QueryBuilder, Repository, SelectQueryBuilder, Transaction, UpdateResult } from 'typeorm';
 import { Users } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IdDto } from 'src/dto/id.dto';
+import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { UpdateNameDto } from './dto/update-name.dto';
+import { UpdateIsSubscribedTopicsAlarmAllowedDto } from './dto/update-is-subscribed-topics-alarm-allowed.dto';
 
 @Injectable()
 export class UsersService {
@@ -26,6 +29,43 @@ export class UsersService {
     return await this.usersRepository.save(newUsers);
   }
 
+  async updateProfileImage(usersId: number, newProfileImage: UpdateProfileImageDto): Promise<void> {
+    const result = await this.usersRepository.createQueryBuilder('Users')
+      .update(Users)
+      .set({ profileImage: newProfileImage.profileImage })
+      .where({ id: usersId })
+      .execute();
+    
+    if(result.affected !== 1) throw new HttpException('Fail to update profile image', HttpStatus.BAD_REQUEST);
+  }
+
+  async updateName(usersId: number, newName: UpdateNameDto): Promise<void> {
+    const hasName = await this.usersRepository.createQueryBuilder('Users')
+      .select(['Users.id'])
+      .where({ name: newName.name })
+      .getCount();
+    
+    if(hasName === 1) throw new HttpException({code: 101, message: '중복된 이름이 존재합니다.'}, HttpStatus.BAD_REQUEST);
+
+    const result = await this.usersRepository.createQueryBuilder('Users')
+      .update(Users)
+      .set({ name: newName.name })
+      .where({ id: usersId })
+      .execute();
+    
+    if(result.affected !== 1) throw new HttpException({code: 100, message: 'Fail to update username'}, HttpStatus.BAD_REQUEST);
+  }
+
+  async updateIsSubscribedTopicsAlarmAllowed(usersId: number, newIsSubscribedTopicsAlarmAllowed: UpdateIsSubscribedTopicsAlarmAllowedDto): Promise<void> {
+    const result = await this.usersRepository.createQueryBuilder('Users')
+      .update(Users)
+      .set({ isSubscribedTopicsAlarmAllowed: newIsSubscribedTopicsAlarmAllowed.isSubscribedTopicsAlarmAllowed })
+      .where({ id: usersId })
+      .execute();
+    
+    if(result.affected !== 1) throw new HttpException({code: 100, message: 'Fail to update isSubscribedTopicsAlarmAllowed'}, HttpStatus.BAD_REQUEST);
+  }
+
   async findByServiceId(serviceId: string) {
     return await this.usersRepository.findOneBy({ serviceId });
   }
@@ -42,5 +82,14 @@ export class UsersService {
     });
 
     return foundUsers.subscribedTopics;
+  }
+
+  async getIsSubscribedTopicsAlarmAllowed(usersId: number): Promise<boolean> {
+    const result = await this.usersRepository.createQueryBuilder('Users')
+      .select('Users.isSubscribedTopicsAlarmAllowed', 'isSubscribedTopicsAlarmAllowed')
+      .where({ id: usersId })
+      .getRawOne();
+    
+      return result.isSubscribedTopicsAlarmAllowed;
   }
 }

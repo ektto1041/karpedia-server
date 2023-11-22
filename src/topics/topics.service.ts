@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Topics } from "./topics.entity";
-import { Equal, In, Repository } from "typeorm";
-import { TopicsWithCategoriesDto } from "./dto/topics-with-categories.dto";
+import { In, Repository } from "typeorm";
+import { TopicsWithCategoriesIdDto } from "./dto/topics-with-categories-id.dto";
 import { TopicsWithChaptersWithPostsDto } from "./dto/topics-with-chapters-with-posts.dto";
 import { TopicsDto } from "./dto/topics.dto";
 import { Categories } from "src/categories/categories.entity";
@@ -15,6 +15,8 @@ import { TopicsNameDto } from "./dto/topics-name.dto";
 import { TopicsWithOneChaptersDto, TopicsWithOneChaptersRaw } from "./dto/topics-with-one-chapters.dto";
 import { TopicsWithOneChaptersWithOnePostsDto, TopicsWithOneChaptersWithOnePostsRaw } from "./dto/topics-with-one-chapters-with-one-posts.dto";
 import { Users } from "src/users/users.entity";
+import { TopicsWithCategoriesNameDto } from "./dto/topics-with-categories-name.dto";
+import { Subscriber } from "src/users/dto/subscriber.dto";
 
 @Injectable()
 export class TopicsService {
@@ -63,12 +65,12 @@ export class TopicsService {
     const allCategories: Categories[] = await this.categoriesService.findAll();
 
     // 2. find all Topics
-    const allTopics: TopicsWithCategoriesDto[] = await this.topicsRepository
+    const allTopics: TopicsWithCategoriesIdDto[] = await this.topicsRepository
       .createQueryBuilder('Topics')
       .leftJoinAndSelect('Topics.categories', 'Categories')
       .select(['Topics.name AS name', 'Topics.id AS id', 'Topics.description AS description', 'Topics.orders AS orders', 'Categories.id AS categoriesId'])
       .orderBy('orders', 'DESC')
-      .getRawMany<TopicsWithCategoriesDto>();
+      .getRawMany<TopicsWithCategoriesIdDto>();
 
     // 3. create Res DTO
     const categoriesDtoList = allCategories.map(c => c.toCategoriesDto());
@@ -171,6 +173,19 @@ export class TopicsService {
     return TopicsWithOneChaptersWithOnePostsDto.fromRaw(foundTopics);
   }
 
+  async findAllSubscribed(usersId: number): Promise<TopicsWithCategoriesNameDto[]> {
+    return await this.topicsRepository.createQueryBuilder('Topics')
+      .leftJoin('Topics.subscribedUsers', 'SubsUsers')
+      .leftJoin('Topics.categories', 'Categories')
+      .select('Topics.id', 'id')
+      .addSelect('Topics.name', 'name')
+      .addSelect('Topics.description', 'description')
+      .addSelect('Topics.orders', 'orders')
+      .addSelect('Categories.name', 'categoriesName')
+      .where('SubsUsers.id = :usersId', { usersId })
+      .getRawMany<TopicsWithCategoriesNameDto>();
+  }
+
   async update(topics: TopicsDto): Promise<TopicsDto> {
      const foundTopics = await this.topicsRepository.findOne({ where: { id: topics.id } });
      foundTopics.update(topics);
@@ -198,10 +213,11 @@ export class TopicsService {
       .leftJoin('Topics.subscribedUsers', 'SubsUsers')
       .select('SubsUsers.id AS usersId')
       .where('Topics.id = :topicsId', { topicsId })
+      .andWhere('SubsUsers.id = :usersId', { usersId })
       .getRawOne();
     
     let subscribeResult = false;
-    if(found.usersId) {
+    if(found?.usersId) {
       await this.topicsRepository.createQueryBuilder('Topics')
         .relation(Users, 'subscribedTopics')
         .of(usersId)
@@ -216,6 +232,17 @@ export class TopicsService {
     }
 
     return subscribeResult;
+  }
+
+  async getSubscribers(topicsId: number): Promise<Subscriber[]> {
+    const result = await this.topicsRepository.createQueryBuilder('Topics')
+      .leftJoin('Topics.subscribedUsers', 'Users')
+      .select('Users.email', 'email')
+      .addSelect('Users.isSubscribedTopicsAlarmAllowed', 'isSubscribedTopicsAlarmAllowed')
+      .where({ id: topicsId })
+      .getRawMany<Subscriber>();
+    
+    return result.filter(s => s.isSubscribedTopicsAlarmAllowed === 1);
   }
 
   delete(topicsId: number) {

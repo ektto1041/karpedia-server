@@ -5,6 +5,8 @@ import { In, Repository } from 'typeorm';
 import { NewPostsDto } from './dto/new-posts.dto';
 import { ChaptersService } from 'src/chapters/chapters.service';
 import { NewPostsUpdateDto } from './dto/new-posts-update.dto';
+import { TopicsService } from 'src/topics/topics.service';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class PostsService {
@@ -12,6 +14,8 @@ export class PostsService {
     @InjectRepository(Posts)
     private readonly postsRepository: Repository<Posts>,
     private readonly chaptersService: ChaptersService,
+    private readonly topicsService: TopicsService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(newPosts: NewPostsDto): Promise<Posts> {
@@ -27,6 +31,13 @@ export class PostsService {
     posts.orders = maxOrder+1;
 
     const savedPosts = await this.postsRepository.save(posts);
+
+    // 메일 처리
+    const subscribers = await this.topicsService.getSubscribers(foundChapters.topics.id);
+    console.log('### Subscribers: ');
+    console.log(subscribers);
+
+    this.mailService.sendToSubscribers(subscribers, foundChapters.topics.name, foundChapters.topics.id);
 
     return savedPosts;
   };

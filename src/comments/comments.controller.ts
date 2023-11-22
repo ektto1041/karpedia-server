@@ -5,6 +5,7 @@ import { Request, Response } from "express";
 import { CommentsWithPublicUsersWithReplyToDto } from "./dto/comments-with-public-users-with-reply-to.dto";
 import { NewCommentsUpdateDto } from "./dto/new-comments-update.dto";
 import { CommentsDto } from "./dto/comments.dto";
+import { CommentsByUsersDto } from "./dto/comments-by-users.dto";
 
 @Controller('comments')
 export class CommentsController {
@@ -16,6 +17,11 @@ export class CommentsController {
   async findAllWithPublicUsersWithReplyToIdByPostsId(@Param('postId') postsId: number): Promise<CommentsWithPublicUsersWithReplyToDto[]> {
     return await this.commentsService.findAllWithPublicUsersWithReplyToByPostsId(postsId);
   };
+
+  @Get('user/:usersId')
+  async findAllByUsersId(@Param('usersId') usersId: number): Promise<CommentsByUsersDto[]> {
+    return await this.commentsService.findAllByUsersId(usersId);
+  }
 
   @Post()
   async create(@Body() newComments: NewCommentsDto, @Req() req: Request, @Res() res: Response) {
